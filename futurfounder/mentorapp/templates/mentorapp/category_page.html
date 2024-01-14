@@ -1,0 +1,43 @@
+{% load static %}
+{% include 'mentorapp/header.html' %}
+{% comment %} <h1>Mentors in {{ category.name }}</h1>
+
+<ul>
+  {% for mentor in mentors %}
+    <li>
+      <h2>{{ mentor.name }}</h2>
+      <p>Qualification: {{ mentor.qualification }}</p>
+      <!-- Display other mentor details as needed -->
+    </li>
+  {% endfor %}
+</ul> {% endcomment %}
+<div class="mentor_profile_main_page">
+  {% for mentor in mentors %}
+    <div class="mentor_profile container">
+      <div class="mentor_image_main">
+        <img src="{{ mentor.image.url }}" alt="{{ mentor.name }}" class="card-img-top" width="150px">
+      </div>
+      <div class="mentor_details">
+        <h2>{{ mentor.name }}<sub>{{ mentor.locality }}</sub></h2>
+        <p>{{ mentor.experience }} years of experience</p>
+    
+        <!-- Display mentor specializations if available -->
+        {% if mentor.specializations.all %}
+            <p>Specializations:</p>
+            <ul>
+                {% for specialization in mentor.specializations.all %}
+                    <li>{{ specialization.specialist }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No specializations available for this mentor.</p>
+        {% endif %}
+        <hr>
+        <h3>About</h3>
+        <p>{{mentor.about}}</p>
+        <a href="{% url 'mentor_details' mentor.id %}" class="view_more">View More</a>
+    </div>
+    </div>
+  {% endfor %} 
+</div>
+{% include 'mentorapp/footer.html' %}
