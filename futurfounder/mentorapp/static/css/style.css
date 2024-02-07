@@ -52,6 +52,12 @@ body {
         padding: 0 20px 0 20px;
     }
 }
+/*mobile view*/
+@media (max-width: 480px) {
+    .section_three_content, .second_section_card{
+        flex-direction: column !important;
+    }
+}
 
 .navbar-nav li a {
     font-weight: 700;
@@ -194,6 +200,8 @@ h2 {
 .image_div img {
     border-radius: 50%;
     width: 50%;
+    aspect-ratio: 1;
+    object-fit: cover;
 }
 
 .card-text {
@@ -407,6 +415,7 @@ h2 {
 .mentor_image_main {
     border-radius: 50%;
     width: 100%;
+    max-width: 350px;
 }
 
 .view_more {
@@ -446,6 +455,8 @@ h2 {
     border-radius: 50%;
     bottom: -210px;
     position: relative;
+    aspect-ratio: 1;
+    object-fit: cover;
 }
 
 .social_media ul {

@@ -1,0 +1,91 @@
+{% load static %}
+{% include 'mentorapp/header.html' %}
+<div class="main_mentor_container"  id="contact">
+  <div class="blue_area">
+    <div class="container">
+      <img src="{{ mentor.image.url }}" alt="" class="mentor-img-top" />
+      <div class="social_media">
+        <ul>
+          <li>
+            {% if mentor.instagram %}
+              <a href="{{ mentor.instagram }}" target="_blank"><i class="fab fa-instagram"></i></a>
+            {% endif %}
+          </li>
+          <li>
+            {% if mentor.Facebook %}
+              <a href="{{ mentor.Facebook }}" target="_blank"><i class="fab fa-facebook"></i></a>
+            {% endif %}
+          </li>
+          <li>
+            {% if mentor.linkedin %}
+              <a href="{{ mentor.linkedin }}" target="_blank"><i class="fab fa-linkedin"></i></a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="mentor_content container">
+    <div class="mentor_head">
+      <h3>{{ mentor.name }}</h3>
+      <ul>
+        {% for specialization in mentor.specializations.all %}
+          <li>{{ specialization.specialist }} | {{ specialization.category.name }}</li>
+          {% empty %}
+          <li>No specializations found.</li>
+        {% endfor %}
+      </ul>
+      <p>
+        <i class="fa-solid fa-location-dot"></i> {{ mentor.get_locality_display }}
+      </p>
+      <p>
+        <i class="fa-solid fa-fingerprint"></i> Active from {{ mentor.pub_date|date:'F d, Y' }}
+      </p>
+      <p>
+        <i class="fa-solid fa-briefcase"></i> {{ mentor.experience }} Years of Experience
+      </p>
+      <p>
+        <i class="fa-solid fa-clock"></i>
+        {% if mentor.start_weekday and mentor.end_weekday %}
+          Available from
+          {{ mentor.start_weekday|title }} {{ mentor.time_from|time:'h:i A' }}
+          to{% if mentor.start_weekday == mentor.end_weekday %}
+            {{ mentor.end_weekday|title }} {{ mentor.time_to|time:'h:i A' }}
+          {% else %}
+            Saturday {{ mentor.time_to|time:'h:i A' }}
+          {% endif %}
+        {% else %}
+          Availability not specified
+        {% endif %}
+      </p>
+    </div>
+    <div class="contact_mentor">
+      <form action="{% url 'mentor_details' mentor.id %}" method="post">
+        {% csrf_token %}
+        <h4>Choose {{ mentor.name }} as your Mentor</h4>
+        <hr />
+        <input type="text" name="mentor_name" value="{{ mentor.name }}" readonly />
+        <input type="text" class="hide" name="mentor_contact" value="{{ mentor.contact }}" readonly />
+        <input type="text" name="mentee_name" placeholder="Enter your name" />
+        <input type="tel" name="contact_number" pattern="[0-9]*" inputmode="numeric" placeholder="Enter your Contact Number" />
+        <textarea name="mentee_requirement" id="" cols="40" rows="3" placeholder="How can {{ mentor.name }} help You"></textarea>
+        <input type="submit" value="Submit" class="mentor_apply_btn" />
+      </form>
+    </div>
+  </div>
+  <div class="   container">
+    <h4>About</h4>
+    <p>{{ mentor.about }}</p>
+    {% if mentor.status == True %}
+      <div class="status_mentor">
+        <span><i class="fa-solid fa-check"></i><p>Mentor is available</p></span>
+        <a href="#contact" class="active-mentor">Contact</a>
+      </div>
+    {% else %}
+      <div class="status_mentor" style="background-color: #a2080811;color: #a20808;">
+        <span><i class="fa-solid fa-xmark"></i><p>Mentor is inactive</p></span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% include 'mentorapp/footer.html' %}

@@ -1,0 +1,33 @@
+{% load static %}
+{% include 'mentorapp/header.html' %}
+<div class="all_mentors_main">
+  <div class="search_area container">
+    <div class="blank_area"></div>
+    <div class="search_box">
+      <input type="text" placeholder="Search by Category" />
+      <a href="#">Search Mentors</a>
+    </div>
+  </div>
+  <div class="profile_area container">
+    {% for mentor in mentors %}
+    <a href="{% url 'mentor_details' mentor.id %}" class="nodecoration">
+      <div class="card" style="width: 10rem;">
+        <div class="image_div">
+          <img src="{{ mentor.image.url }}" class="card-img-top" alt="Mentor Image" width="10px" />
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ mentor.name }}</h5>
+          <p class="card-text">
+            {% for category in mentor.categories.all %}
+              {{ category.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </p>
+          <hr>
+          <strong class="wordwrap">{{ mentor.qualification }}</strong>
+          <p class="card-text">Experience : {{ mentor.experience }} years</p>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>

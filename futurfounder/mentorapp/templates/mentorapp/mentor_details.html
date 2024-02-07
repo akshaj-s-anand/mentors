@@ -62,7 +62,7 @@
     <div class="contact_mentor">
       <form action="{% url 'mentor_details' mentor.id %}" method="post">
         {% csrf_token %}
-        <h4>Choose {{ mentor.name }} as your Mentor</h4>
+        <h4>Choose {{ mentor.name }} as your Mentor</h4> 
         <hr />
         <input type="text" name="mentor_name" value="{{ mentor.name }}" readonly />
         <input type="text" class="hide" name="mentor_contact" value="{{ mentor.contact }}" readonly />

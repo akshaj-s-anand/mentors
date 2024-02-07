@@ -1,0 +1,116 @@
+{% load static %}
+{% include 'mentorapp/header.html' %}
+<div class="section_one">
+  <h5>Learn a new skill, launch a project, land your dream career.</h5>
+  <h2 class="main_head">1-on-1 <span id="dynamic_text" style="color: #146b58; opacity: 0;"></span><br>Mentorship</h2>
+  <div class="search_box">
+    <input type="text" placeholder="Search by Category">
+    <a href="#">Search Mentors</a>
+  </div>
+  <div class="card_slider">
+    {% comment %} card1 {% endcomment %}
+    {% for mentor in mentors %}
+    <a href="{% url 'mentor_details' mentor.id %}" class="nodecoration">
+    <div class="card" style="width: 10rem;">
+      <div class="image_div">
+        <img src="{{ mentor.image.url }}" class="card-img-top" alt="Mentor Image" width="10px">
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">{{ mentor.name }}</h5>
+          <p class="card-text">
+            {% for category in mentor.categories.all %}
+              {{ category.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </p>
+      </div>
+    </div>
+  </a>
+    {% endfor %}
+
+  </div>
+</div>
+{% comment %} section one ends {% endcomment %}
+{% comment %} section two starts {% endcomment %}
+<div class="section_two">
+  <div class="container">
+    <h2>At your fingertips: a dedicated career <br>coach.</h2>
+    <p>Want to ace your next job interview? Successfully build your startup? Itching to learn high-demand skills? Work smart with an online mentor or coach by your side to offer expert advice and guidance to match your zeal. Become unstoppable using MentorCruise.</p>
+    <div class="second_section_card">
+      <div class="card-two" style="width: 18rem;">
+        <h3>Find your mentor</h3>
+        <img src="{% static 'images/mc-logo.svg' %}" class="card-img-top-two" alt="...">
+        <div class="card-body-two">
+          <p class="card-text-two">Explore our growing catalogue of experienced mentors until you find the perfect fit.</p>
+        </div>
+      </div>
+      <div class="card-two" style="width: 18rem;">
+        <h3>Find your mentor</h3>
+        <img src="{% static 'images/mc-edit.svg' %}" class="card-img-top-two" alt="...">
+        <div class="card-body-two">
+          <p class="card-text-two">Fill in an application, and if you’re a match with your chosen mentor you can start your free 7-day trial.</p>
+        </div>
+      </div>
+      <div class="card-two" style="width: 18rem;">
+        <h3>Find your mentor</h3>
+        <img src="{% static 'images/mc-rocket.svg' %}" class="card-img-top-two" alt="...">
+        <div class="card-body-two">
+          <p class="card-text-two">From personal chats to hands-on support, each mentor offers different services to help you skyrocket your career.</p>
+        </div>
+      </div>
+    </div>
+    <div class="button_area">
+      <a href="" class="btn1">Become a mentor</a>
+      <a href="" class="btn2">Find my mentor</a>
+    </div>
+  </div>
+</div>
+{% comment %} section two ends  {% endcomment %}
+{% comment %} section three starts  {% endcomment %}
+<div class="section_three">
+  <div class="container">
+    <h2>Learn that new skill, launch that project, land your dream career.</h2>
+    <p>Your online mentor can elevate your career or be a shoulder to lean on. Get a personalized mentoring program, including curated study plans, regular check-ins, and unlimited actionable support. Be part of an online mentor community that spans across the globe</p>
+    <div class="section_three_content">
+      <div class="content_container">
+        <h3>Expert mentorship. One text away.</h3>
+        <p>
+          Ask questions, kick the tires on a new idea, or discuss professional progress and improvements in your online mentoring sessions with unlimited messaging.
+        </p>
+        <p>
+          Have an upcoming interview at Amazon? Need help in product management or marketing? Whatever it is, our online mentors are there for you.
+        </p>
+        <strong>Fewer interruptions in your day-to-day and easier documentation. A text away, get expert guidance at your convenience from your mentor.</strong>
+      </div>
+      <div class="content_container">
+        <img src="{% static 'images/chat-screen_2x.jpg' %}" class="chat_image" alt="...">
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+{% comment %} full page div ends {% endcomment %}
+
+ 
+
+<script>
+  const words = ['Technical', 'Business', 'Growth', 'Agricultural'];
+let index = 0;
+
+function changeWord() {
+    const textElement = document.getElementById('dynamic_text');
+    const currentWord = words[index];
+
+    textElement.style.animation = 'none'; // Reset animation
+    textElement.offsetHeight; // Trigger reflow to restart the animation
+    textElement.style.animation = 'fade-in-out 3s ease-in-out'; // Set animation
+
+    textElement.textContent = currentWord;
+    index = (index + 1) % words.length;
+}
+
+changeWord();
+setInterval(changeWord, 3000);
+
+
+</script>
+{% include 'mentorapp/footer.html' %}

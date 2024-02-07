@@ -2,7 +2,7 @@ from django import forms
 from .models import Mentee
 
 class MenteeForm(forms.ModelForm):
-    class Meta:
+    class Meta: 
         feild = [
         'mentor_name',
         'mentor_contact',
