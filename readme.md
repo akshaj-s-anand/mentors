@@ -1,2 +1,2 @@
-username = superuser
-password = iamtheadminofmentors
+username = admin
+password = admin
