@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Contact - OldScool
+{% endblock %}
+{% block navigation %}
+  {% include 'nav.html' %}
+{% endblock %}
+{% block homebanner %}
+  <section class="mt-5">
+    <div class="container">
+      <h2 class="text-center primary-h1">Contact US</h2>
+      <div class="row">
+        <div class="col-md-6">
+          <!-- Google map embeded -->
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7804.373418845058!2d75.362134089438!3d12.030663646048556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba43f93745c5b83%3A0xf1710dbf25ed3b6d!2sTrichambaram%2C%20Taliparamba%2C%20Kerala%20670141!5e0!3m2!1sen!2sin!4v1721214536054!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="col-md-6">
+          <form method="post" class="border p-5 rounded">
+            {% csrf_token %}
+            <!-- Messages -->
+            {% if messages %}
+              <div class="alert alert-success" role="alert">
+                {% for message in messages %}
+                  {{ message }}
+                {% endfor %}
+              </div>
+            {% endif %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% block sectiononehome %}
+
+  {% endblock %}
+  <script>
+    document.getElementById('id_phone_number').addEventListener('keypress', function (e) {
+      // restrict input keys to integers
+      if (e.key < '0' || e.key > '9') {
+        e.preventDefault()
+      }
+      // number of input charachters = 10
+      if (this.value.length >= 10) {
+        e.preventDefault()
+      }
+    })
+  </script>
+{% endblock %}

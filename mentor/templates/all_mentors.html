@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  All Mentors | The Old School
+{% endblock %}
+{% block navigation %}
+  {% include 'nav.html' %}
+  <hr />
+{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <h1 class="mb-4">All Mentors</h1>
+    
+    <!-- Filter Form -->
+    <form method="get" class="mb-4">
+      <div class="row">
+        <div class="col-md-4">
+          <select name="category" class="form-control">
+            <option value="">Select Category</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select name="location" class="form-control">
+            <option value="">Select Location</option>
+            {% for loc in locality_choices %}
+              <option value="{{ loc.0 }}" {% if request.GET.location == loc.0 %}selected{% endif %}>{{ loc.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="row">
+      {% for mentor in mentors %}
+        <div class="col-md-3 mb-3">
+          <div class="card mentor">
+            <div class="card-body">
+              <img src="{{ mentor.image.url }}" class="img-fluid mentor-img-personal" alt="{{ mentor.name }}" style="width:100px;height:100px;"/>
+              <hr>
+              <h5 class="card-title">{{ mentor.name }}</h5>
+              <p class="card-text text-capitalize">
+                <strong>Location:</strong> {{ mentor.locality }}
+              </p>
+              <p class="card-text">{{ mentor.about|truncatewords:20 }}</p>
+              <a href="{% url 'mentor:mentor_details' mentor.id %}" class="btn btn-primary text-white">View Details</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No mentors available.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {% if mentors.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ mentors.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+          </li>
+        {% endif %}
+        {% for num in mentors.paginator.page_range %}
+          {% if mentors.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > mentors.number|add:'-3' and num < mentors.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        {% if mentors.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ mentors.next_page_number }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ mentors.paginator.num_pages }}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+{% endblock %}

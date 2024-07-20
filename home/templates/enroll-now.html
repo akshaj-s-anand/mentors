@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}
+  Tearms and Conditions | The Old Scool
+{% endblock %}
+{% block navigation %}
+  {% include 'nav.html' %}
+{% endblock %}
+
+{% block sectiononehome %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 p-5">
+        <a href="{% url 'mentor:create_mentor' %}" class="text-decoration-none">
+          <div class="flex flex-column border rounded p-3" data-link="{% url 'mentor:create_mentor' %}" style="cursor: pointer;">
+            <h2 class="secondary-h1 visible d-flex justify-content-center w-100">Register as a Mentor!!</h2>
+            <hr />
+            <p class="text-justify text-dark">Registering as a mentor on our mentorship platform offers numerous benefits, including the opportunity to share your expertise and make a meaningful impact on the careers and lives of aspiring professionals. As a mentor, you'll gain personal fulfillment by guiding others towards their goals, enhancing your leadership and communication skills. Additionally, you can expand your professional network, gain fresh perspectives, and stay updated with the latest industry trends through interactions with mentees. This role not only helps you build a reputation as a thought leader in your field but also provides access to a wealth of resources and a supportive community of like-minded professionals.</p>
+          </div>
+        </a>
+      </div>
+      <div class="col-md-6 p-5">
+        <a href="{% url 'localproj:create_project' %}" class="text-decoration-none">
+          <div class="flex flex-column border rounded p-3" data-link="{% url 'localproj:create_project' %}" style="cursor: pointer;">
+            <h2 class="secondary-h1 visible d-flex justify-content-center w-100">Post your Projects!!</h2>
+            <hr />
+            <p class="text-justify text-dark">Posting local projects on our site for help offers significant advantages, including increased community engagement and access to a broader pool of local talent and resources. It allows project owners to tap into the expertise of nearby mentors and professionals who are familiar with the local context and challenges. This localized approach fosters stronger collaborations, encourages knowledge sharing, and can lead to faster, more effective solutions tailored to the community's specific needs. Additionally, it enhances the visibility of local initiatives, attracting support and recognition from stakeholders, which can drive project success and contribute to the overall development of the local area.</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

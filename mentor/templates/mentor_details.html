@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Mentor Details | The Old School
+{% endblock %}
+{% block navigation %}
+  {% include 'nav.html' %}
+  <hr />
+{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <h1 class="mb-4">{{ mentor.name }}</h1>
+    <div class="row">
+      <div class="col-md-6">
+        <img src="{{ mentor.image.url }}" class="img-fluid mentor-img-personal" alt="{{ mentor.name }}" />
+      </div>
+      <div class="col-md-6">
+        {% if messages %}
+          <div class="container mt-3">
+              {% for message in messages %}
+                <li class="alert alert-{{ message.tags }}" role="alert" style="list-style: none;">{{ message }}</li>
+              {% endfor %}
+          </div>
+        {% endif %}
+        <table class="table table-bordered">
+          <tbody>
+            {% comment %} <tr>
+              <th>Contact</th>
+              <td>{{ mentor.contact }}</td>
+            </tr>
+            <tr>
+              <th>Email</th>
+              <td>{{ mentor.email }}</td>
+            </tr> {% endcomment %}
+            <tr>
+              <th>Qualification</th>
+              <td>{{ mentor.qualification }}</td>
+            </tr>
+            <tr>
+              <th>Experience</th>
+              <td>{{ mentor.experience }} years</td>
+            </tr>
+            <tr>
+              <th>Location</th>
+              <td>{{ mentor.locality }}</td>
+            </tr>
+            <tr>
+              <th>About</th>
+              <td>{{ mentor.about }}</td>
+            </tr>
+            <tr>
+              <th>Availability</th>
+              <td>From {{ mentor.start_weekday }} to {{ mentor.end_weekday }} ({{ mentor.time_from }} - {{ mentor.time_to }})</td>
+            </tr>
+            <tr>
+              <th>Instagram</th>
+              <td>
+                <a href="{{ mentor.instagram|default:'#' }}" target="_blank">{{ mentor.instagram|default:'#' }}</a>
+              </td>
+            </tr>
+            <tr>
+              <th>LinkedIn</th>
+              <td>
+                <a href="{{ mentor.linkedin|default:'#' }}" target="_blank">{{ mentor.linkedin|default:'#' }}</a>
+              </td>
+            </tr>
+            <tr>
+              <th>Facebook</th>
+              <td>
+                <a href="{{ mentor.facebook|default:'#' }}" target="_blank">{{ mentor.facebook|default:'#' }}</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h2>Contact your mentor</h2>
+        <!-- Form to update responses -->
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <input type="hidden" name="mentor_name" value="{{ mentor.name }}" />
+          <input type="hidden" name="mentor_contact" value="{{ mentor.contact }}" />
+
+          <div class="form-group">
+            <label for="mentee_name">Mentee Name</label>
+            <input type="text" id="mentee_name" name="mentee_name" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="contact_number">Contact Number</label>
+            <input type="text" id="contact_number" name="contact_number" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="mentee_requirement">Mentee Requirement</label>
+            <textarea id="mentee_requirement" name="mentee_requirement" class="form-control" rows="3" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Response</button>
+        </form>
+      </div>
+    </div>
+    <a href="{% url 'mentor:all_mentor' %}" class="btn btn-secondary mt-3">Back to Mentors</a>
+  </div>
+{% endblock %}

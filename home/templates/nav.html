@@ -1,0 +1,30 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container p-0">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <!-- logo starts -->
+      <img src="{% static 'images/primarylogo.svg' %}" alt="site logo" width="200px" />
+      <!-- logo ends -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'home:home' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'home:about' %}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'mentor:all_mentor' %}">Local Talents</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'localproj:all_projects' %}">Local Projects</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url "home:contact" %}">Contact</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<hr />

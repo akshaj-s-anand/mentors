@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  Register as a Mentor | The Old Scool
+{% endblock %}
+
+<!-- navigation bar begins -->
+{% block navigation %}
+  {% include 'nav.html' %}
+  <hr />
+{% endblock %}
+<!-- navigation bar ends -->
+{% block homebanner %}
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-md-8 bg-white border rounded p-4">
+        <form method="post" class="col-md-8 w-100 mt-2 get-form-project" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="bg-primary-orange p-3 rounded mb-4">
+            <h2 class="secondary-h1 visible d-flex justify-content-center w-100">Register as a Mentor!!</h2>
+            <p class="text-center">Complete the form below to register as a mentor and join the team</p>
+          </div>
+          {% for field in form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">
+                {{ field.label }}
+                {% if field.field.required %}
+                  <span class="text-danger">*</span>
+                {% endif %}
+              </label>
+              {% if field.field.widget.input_type != 'checkbox' %}
+                {{ field }}
+              {% else %}
+                <div class="form-check">{{ field }}</div>
+              {% endif %}
+              {% if field.errors %}
+                <div class="invalid-feedback">
+                  {% for error in field.errors %}
+                    <div>{{ error }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+      <div class="col-md-4">
+        <div class="bg-primary-green p-3 rounded mb-4">
+          <h2 class="secondary-h1 visible d-flex justify-content-center w-100">Terms and Conditions</h2>
+          <div class="alert alert-warning" role="alert">Please read this before registering as a mentor</div>
+        </div>
+        <div class="bg-white bodered rounded p-3">
+          <ol>
+            {% for term in terms_and_conditions %}
+              <li>{{ term }}</li>
+            {% endfor %}
+          </ol>
+        </div>
+        <div class="alert alert-info mt-3" role="alert">Once you submit the form administrator of this site will contact you for verification. This will be done within 24 hours. Please wait patiently</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Get all select elements
+      var selects = document.querySelectorAll('select')
+    
+      // Loop through each select element and add the class 'form-select'
+      selects.forEach(function (select) {
+        select.classList.add('form-select')
+      })
+    })
+  </script>
+{% endblock %}

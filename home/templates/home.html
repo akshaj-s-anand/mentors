@@ -1,0 +1,268 @@
+{% extends 'base.html' %} {% load static %} {% block title %} Entrepreneur's
+Center | The Old Scool {% endblock %}
+
+<!-- navigation bar begins -->
+{% block navigation %} {% include 'nav.html' %} {% endblock %}
+<!-- navigation bar ends -->
+
+<!-- home banner section starts -->
+<!-- circles starts -->
+{% block homebanner %}
+<div class="green-circle gc-1-pos"></div>
+<div class="orange-circle oc-1-pos"></div>
+<div class="green-circle gc-2-pos"></div>
+<div class="orange-circle oc-2-pos"></div>
+<hr style="margin: 0" />
+<!-- circles ends -->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8">
+      <div>
+        <div class="d-flex flex-column">
+          <h1 class="primary-h1 visible" id="text1">
+            Grow <br />
+            Your Business <br /><span class="green-text">Locally</span>
+          </h1>
+          <h1 class="primary-h1" id="text2" style="display: none">
+            Build A <br />
+            Career Near Your <br /><span class="green-text">Home</span>
+          </h1>
+          <h1 class="primary-h1" id="text3" style="display: none">
+            Get Local<br />Professional
+             <br /><span class="green-text">Mentorship</span>
+          </h1>
+        </div>
+      </div>
+      <div>
+        <div class="d-flex flex-column">
+          <p class="primary-p" id="text">
+            Explore unfamiliar territory, embrace diverse cultures, and discover
+            opportunities that ignite your creativity.
+          </p>
+        </div>
+      </div>
+      <div>
+        <div class="d-flex left-padding-20 w-100">
+          <div class="row w-100">
+            <div class="col-lg">
+              <a href="{% url 'home:enroll' %}" class="green-btn text-center"
+                >Enroll Now</a
+              >
+              <a
+                href="{% url 'home:tearms_and_conditions' %}"
+                class="orange-btn text-center"
+                >Learn More</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-5 d-flex flex-column">
+        <div
+          id="projectCarousel"
+          class="carousel slide carousel-fade"
+          data-ride="carousel"
+          data-interval="5000"
+        >
+          <div class="carousel-inner">
+            {% for project in projects %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                  <div class="border rounded p-5 project">
+                    <h5>{{ project.project_name }}</h5>
+                    <p>{{ project.description|default:'No description available.'|truncatewords:40 }}</p>
+                  </div>
+                </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <form method="get" action="{% url 'localproj:all_projects' %}" class="col-md-8 w-100 mt-2 get-form-project">
+          <select name="project_name" class="col-3">
+            <option value="">Select Project Name</option>
+            {% for name in project_names %}
+              <option value="{{ name }}">{{ name }}</option>
+            {% endfor %}
+          </select>
+          <select name="location" class="col-3">
+            <option value="">Select Location</option>
+            {% for locality in locality_choices %}
+              <option value="{{ locality.0 }}">{{ locality.1 }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="get-btn-project col-3">Search</button>
+        </form>
+    </div>
+    <!-- card caurosel starts -->
+
+    <div class="col-md-3">
+      <div
+        id="cardCarousel"
+        class="carousel slide carousel-fade"
+        data-ride="carousel"
+        data-interval="5000"
+      >
+        <div class="carousel-inner">
+          {% for mentor in mentors %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <div class="card">
+              {% if mentor.image %}
+              <img
+                src="{{ mentor.image.url }}"
+                class="card-img-top mentor-img"
+                alt="{{ mentor.name }}"
+              />
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title h5">{{ mentor.name }}</h5>
+                <p class="card-text">
+                  {{ mentor.specializations.all|slice:":3"|join:", " }}
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <!-- card caurosel ends -->
+      <form
+        method="get"
+        action="{% url 'mentor:all_mentor' %}"
+        class="d-flex flex-column w-100 justify-content-between get-form"
+      >
+        <select name="category" id="categorySelect">
+          <option value="">Select Category</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
+        </select>
+        <select name="location" id="locationSelect">
+          <option value="">Select Location</option>
+          {% for locality in locality_choices %}
+          <option value="{{ locality.0 }}">{{ locality.1 }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-success">Search</button>
+      </form>
+    </div>
+    <!-- column ends -->
+  </div>
+</div>
+{% endblock %}
+<!-- home banner section ends -->
+
+{% block sectiononehome %}
+<!-- section two starts -->
+<section class="container mt-5">
+  <!-- this section is for registering a new mentor or project in the website -->
+  <h2 class="secondary-h1 visible d-flex justify-content-center w-100">
+    Hey Future Founders!!
+  </h2>
+  <div class="row">
+    <div
+      class="col-md-6"
+      data-link="{% url 'mentor:create_mentor' %}"
+      style="cursor: pointer"
+    >
+      <div class="d-flex flex-column border p-5 rounded mx-auto project-grid">
+        <img
+          src="{% static 'images/icon.svg' %}"
+          alt=""
+          width="100px"
+          style="margin-bottom: 30px"
+        />
+        <h3>List your profile</h3>
+        <p>
+          Boost visibility, connect with clients, and showcase expertise
+          effectively.
+        </p>
+      </div>
+    </div>
+    <div
+      class="col-md-6"
+      data-link="{% url 'localproj:create_project' %}"
+      style="cursor: pointer"
+    >
+      <div class="d-flex flex-column border p-5 rounded mx-auto project-grid">
+        <img
+          src="{% static 'images/proj-icon.svg' %}"
+          alt=""
+          width="100px"
+          style="margin-bottom: 30px"
+        />
+        <h3>Post your Project</h3>
+        <p>
+          Increase collaboration opportunities, gain feedback, and attract
+          potential clients.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- section two ends -->
+{% endblock %} {% block sectiontwohome %}
+<section class="container mt-5">
+  <h2 class="secondary-h1 visible d-flex justify-content-center w-100">
+    How Do Our Connected Spaces Work?
+  </h2>
+  <div class="row">
+    <div class="col-md-3">
+      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+        <h2>LOCAL FOCUS</h2>
+        <p>
+          We believe in the power of local communities. By connecting
+          specialists, experts, and self-employed individuals with businesses in
+          their area, we strengthen local economies and foster collaboration
+          within thriving, vibrant, and supportive neighborhoods.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+        <h2>DIVERSE TALENT POOL</h2>
+        <p>
+          Whether you’re a graphic designer, web developer, writer, marketer, or
+          any other type of freelancer, Old Scool welcomes all skill sets and
+          professions. Our platform offers a diverse talent pool to meet the
+          unique needs of local industries
+        </p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+        <h2>EFFORTLESS CONNECTION</h2>
+        <p>
+          Say goodbye to endless searches and complicated hiring processes. With
+          Old scool, connecting with local talent or finding projects as a
+          freelancer is simple and efficient. Our user-friendly interface makes
+          it easy to browse, communicate, and collaborate.
+        </p>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+        <h2>SUPPORTIVE COMMUNITY</h2>
+        <p>
+          Joining Old Scool means becoming part of a supportive community of
+          specialists and businesses dedicated to mutual growth and success. If
+          you’re a seasoned professional, you’ll find guidance, resources, and
+          opportunities here.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block sectionthreehome %}
+<section class="container mt-5">
+  <h2 class="secondary-h1 visible d-flex justify-content-center w-100">
+    Join Oldscool Today & Start Making Local Connections!
+  </h2>
+  <div class="d-flex justify-content-center">
+    <a href="https://wa.me/919980217121" target="_blank"
+      ><i class="fa-brands fa-square-whatsapp social-icons"></i
+    ></a>
+    <a href="tel:+919980217121" target="_blank"
+      ><i class="fa-solid fa-phone-volume social-icons" data-link="#"></i
+    ></a>
+  </div>
+</section>
+{% endblock %}

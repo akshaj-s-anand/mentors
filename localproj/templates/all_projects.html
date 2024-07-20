@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  All Projects | The Old School
+{% endblock %}
+{% block navigation %}
+  {% include 'nav.html' %}
+  <hr />
+{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <h1 class="mb-4">All Projects</h1>
+    
+    <!-- Filter Form -->
+    <form method="GET" class="mb-4">
+      <div class="row">
+        <div class="col-md-4">
+          <select name="project_name" class="form-control">
+            <option value="">Select Project Name</option>
+            {% for name in project_names %}
+              <option value="{{ name }}" {% if request.GET.project_name == name %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <select name="location" class="form-control">
+            <option value="">Select Location</option>
+            {% for loc in locations %}
+              <option value="{{ loc }}" {% if request.GET.location == loc %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="row">
+      {% for project in projects %}
+        <div class="col-md-4 mb-4">
+          <div class="card project">
+            <div class="card-body">
+              <h5 class="card-title">{{ project.project_name }}</h5>
+              <p class="card-text">
+                <strong>Location:</strong> {{ project.location }}
+              </p>
+              <p class="card-text">{{ project.description|truncatewords:20 }}</p>
+              <a href="{% url 'localproj:project_details' project.id %}" class="btn btn-primary text-white">View Details</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <p>No projects available.</p>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+      <ul class="pagination justify-content-center">
+        {% if projects.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ projects.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+          </li>
+        {% endif %}
+        {% for num in projects.paginator.page_range %}
+          {% if projects.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > projects.number|add:'-3' and num < projects.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+        {% if projects.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ projects.next_page_number }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ projects.paginator.num_pages }}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+{% endblock %}

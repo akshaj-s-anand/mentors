@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+  {{ project.project_name }} | The Old Scool
+{% endblock %}
+{% block navigation %}
+  {% include 'nav.html' %}
+  <hr />
+{% endblock %}
+{% block homebanner %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header bg-primary-green">
+        <h1 class="card-title">{{ project.project_name }}</h1>
+      </div>
+      <div class="card-body">
+        <p>
+          <strong>Location:</strong> {{ project.location }}
+        </p>
+        <p>
+          <strong>Start Date:</strong> {{ project.start_date }}
+        </p>
+        <p>
+          <strong>End Date:</strong> {{ project.end_date }}
+        </p>
+        <p>{{ project.description }}</p>
+        <hr />
+
+        <!-- Form for adding a comment -->
+        <form method="POST" action="{% url 'localproj:add_comment' project.id %}">
+          {% csrf_token %}
+          <div class="h1">
+            <h3>Submit a response for {{ project.project_name }}</h3>
+          </div>
+          <div class="form-group">
+            <label for="name">Your Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" name="email" required />
+          </div>
+          <div class="form-group">
+            <label for="response">Response:</label>
+            <textarea class="form-control" id="response" name="response" rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
