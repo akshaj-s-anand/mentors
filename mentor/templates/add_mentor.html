@@ -20,6 +20,13 @@
             <h2 class="secondary-h1 visible d-flex justify-content-center w-100">Register as a Mentor!!</h2>
             <p class="text-center">Complete the form below to register as a mentor and join the team</p>
           </div>
+          {% if messages %}
+            <div class="container mt-3">
+              {% for message in messages %}
+                <li class="alert alert-{{ message.tags }}" role="alert" style="list-style: none;">{{ message }}</li>
+              {% endfor %}
+            </div>
+          {% endif %}
           {% for field in form %}
             <div class="mb-3">
               <label for="{{ field.id_for_label }}" class="form-label">

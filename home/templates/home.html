@@ -85,7 +85,7 @@ Center | The Old Scool {% endblock %}
           </select>
           <select name="location" class="col-3">
             <option value="">Select Location</option>
-            {% for locality in locality_choices %}
+            {% for locality in locality_choices_proj %}
               <option value="{{ locality.0 }}">{{ locality.1 }}</option>
             {% endfor %}
           </select>
@@ -137,7 +137,7 @@ Center | The Old Scool {% endblock %}
         </select>
         <select name="location" id="locationSelect">
           <option value="">Select Location</option>
-          {% for locality in locality_choices %}
+          {% for locality in locality_choices_mentor %}
           <option value="{{ locality.0 }}">{{ locality.1 }}</option>
           {% endfor %}
         </select>
@@ -221,7 +221,7 @@ Center | The Old Scool {% endblock %}
         <h2>DIVERSE TALENT POOL</h2>
         <p>
           Whether you’re a graphic designer, web developer, writer, marketer, or
-          any other type of freelancer, Old Scool welcomes all skill sets and
+          any other type of freelancer, Oldscool welcomes all skill sets and
           professions. Our platform offers a diverse talent pool to meet the
           unique needs of local industries
         </p>
@@ -232,7 +232,7 @@ Center | The Old Scool {% endblock %}
         <h2>EFFORTLESS CONNECTION</h2>
         <p>
           Say goodbye to endless searches and complicated hiring processes. With
-          Old scool, connecting with local talent or finding projects as a
+          Oldscool, connecting with local talent or finding projects as a
           freelancer is simple and efficient. Our user-friendly interface makes
           it easy to browse, communicate, and collaborate.
         </p>
@@ -242,7 +242,7 @@ Center | The Old Scool {% endblock %}
       <div class="rounded border p-4 border project-grid mt-3 min-height-320">
         <h2>SUPPORTIVE COMMUNITY</h2>
         <p>
-          Joining Old Scool means becoming part of a supportive community of
+          Joining Oldscool means becoming part of a supportive community of
           specialists and businesses dedicated to mutual growth and success. If
           you’re a seasoned professional, you’ll find guidance, resources, and
           opportunities here.

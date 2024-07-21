@@ -18,14 +18,16 @@ class HomeView(View):
         mentors = Mentors.objects.filter(status=True)
         projects = Project.objects.filter(status=True)
         categories = Category.objects.all()
-        locality_choices = [(choice[0].lower(), choice[1]) for choice in Project.LOCALITY_CHOICES]
+        locality_choices_proj = [(choice[0].capitalize(), choice[1]) for choice in Project.LOCALITY_CHOICES]
+        locality_choices_mentor = [(choice[0].lower(), choice[1]) for choice in Project.LOCALITY_CHOICES]
         project_names = Project.objects.values_list('project_name', flat=True).distinct()
         
         context = {
             'mentors': mentors,
             'projects': projects,
             'categories': categories,
-            'locality_choices': locality_choices,
+            'locality_choices_proj': locality_choices_proj,
+            'locality_choices_mentor': locality_choices_mentor,
             'project_names': project_names,
         }
         return render(request, self.template_name, context)

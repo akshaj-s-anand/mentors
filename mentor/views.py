@@ -12,12 +12,17 @@ class CreateMentor(CreateView):
     model = Mentors
     template_name = 'add_mentor.html'
     form_class = CreateMentorForm
-    success_url = reverse_lazy('home:home') 
+    success_url = reverse_lazy('mentor:create_mentor')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['terms_and_conditions'] = TermsAndConditions.objects.all()
         return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Your registration have been noted and will be in touch soon')
+        return response
     
 class AllMentorsView(ListView):
     model = Mentors

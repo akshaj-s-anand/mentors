@@ -5,18 +5,24 @@ from localproj.forms import CreateProjectForm, CommentForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Count
+from django.contrib import messages
 
 # Create your views here.
 class CreateProject(CreateView):
     model = Project
     template_name = 'add_project.html'
     form_class = CreateProjectForm
-    success_url = reverse_lazy('home:home')
+    success_url = reverse_lazy('localproj:create_project')
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['terms_and_conditions'] = TermsAndConditions.objects.all()
         return context
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Your registration have been noted and will be in touch soon')
+        return response
     
 class AllProjectsView(ListView):
     model = Project

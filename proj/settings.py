@@ -142,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'theoldscool.com'  # Update with your actual SMTP host
+EMAIL_HOST = 'mail.theoldscool.com'  # Update with your actual SMTP host
 EMAIL_PORT = 465  # Update with your SMTP port
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'admin@theoldscool.com'  # Update with your SMTP username

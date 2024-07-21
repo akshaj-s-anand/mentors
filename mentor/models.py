@@ -62,13 +62,6 @@ class Mentors(models.Model):
     start_weekday = models.CharField(max_length=10, choices=WEEKDAY_CHOICES, null=True, blank=True)
     end_weekday = models.CharField(max_length=10, choices=WEEKDAY_CHOICES, null=True, blank=True)
 
-    def clean(self):
-        # Perform validation to ensure start_weekday is before end_weekday
-        if self.start_weekday and self.end_weekday:
-            start_index = dict(self.WEEKDAY_CHOICES).get(self.start_weekday)
-            end_index = dict(self.WEEKDAY_CHOICES).get(self.end_weekday)
-            if start_index and end_index and start_index >= end_index:
-                raise ValidationError("Start weekday must be before end weekday")
     time_from = models.TimeField("From", default='00:00')
     time_to = models.TimeField("To", default='00:00')
     image = models.ImageField(
