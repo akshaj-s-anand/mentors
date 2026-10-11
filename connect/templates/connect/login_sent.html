@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Check your email | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container my-5">
+    <div class="narrow-panel glass-panel p-4 p-md-5 text-center">
+      <span class="icon-bubble"><i class="fa-solid fa-inbox"></i></span>
+      <h1 class="h3 page-title mt-3">Check your email</h1>
+      <p class="text-muted mb-1">If <strong>{{ email }}</strong> belongs to an approved mentor, a login link is on its way.</p>
+      <p class="text-muted">It works for 30 minutes.</p>
+      {% if console_email %}
+        <div class="alert alert-info text-start mt-3 mb-0">
+          <strong>Development mode:</strong> email isn't configured, so the link was printed in the terminal running <code>runserver</code>.
+        </div>
+      {% endif %}
+      <a href="{% url 'connect:login' %}" class="btn btn-secondary mt-4">Use a different email</a>
+    </div>
+  </div>
+{% endblock %}

@@ -1,93 +1,77 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-  All Mentors | The Old School
+  {% if skill %}{{ skill.specialist }} mentors{% if district_label %} in {{ district_label }}{% else %} in Kerala{% endif %}{% else %}All Mentors{% endif %} | The Old School
 {% endblock %}
+{% block meta_description %}{% if skill %}Find verified local {{ skill.specialist }} mentors{% if district_label %} in {{ district_label }}{% else %} across Kerala{% endif %}. Free intro calls, reviews and easy booking on Oldscool.{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block navigation %}
   {% include 'nav.html' %}
-  <hr />
 {% endblock %}
 {% block homebanner %}
-  <div class="container mt-5">
-    <h1 class="mb-4">All Mentors</h1>
-    
-    <!-- Filter Form -->
-    <form method="get" class="mb-4">
-      <div class="row">
+  <div class="container mt-5" data-ajax-list>
+    {% if skill %}
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="{% url 'mentor:all_mentor' %}">Mentors</a> <i class="fa-solid fa-chevron-right"></i>
+        {% if district_label %}
+          <a href="{% url 'mentor:skill' skill.id skill.specialist|slugify|default:'skill' %}">{{ skill.specialist }}</a> <i class="fa-solid fa-chevron-right"></i>
+          <span>{{ district_label }}</span>
+        {% else %}
+          <span>{{ skill.specialist }}</span>
+        {% endif %}
+      </nav>
+      <h1 class="primary-h1 page-title mb-2">{{ skill.specialist }} <span class="green-text">mentors</span></h1>
+      <p class="lead-text mb-4">
+        Local {{ skill.category.name|lower }} experts{% if district_label %} in {{ district_label }}{% else %} across Kerala{% endif %}. Book a call or a free intro.
+      </p>
+    {% else %}
+      <h1 class="primary-h1 page-title mb-4">All <span class="green-text">Mentors</span></h1>
+    {% endif %}
+
+    <!-- Filter Form: changing a filter reloads the results in place -->
+    <form method="get" class="filter-bar glass mb-4" data-ajax-filter role="search">
+      <div class="row g-2">
         <div class="col-md-4">
-          <select name="category" class="form-control">
-            <option value="">Select Category</option>
+          <div class="search-input">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search name, skill, e.g. logo design" aria-label="Search mentors" autocomplete="off" />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select name="category" class="form-control" aria-label="Category">
+            <option value="">All Categories</option>
             {% for category in categories %}
               <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
             {% endfor %}
           </select>
         </div>
-        <div class="col-md-4">
-          <select name="location" class="form-control">
-            <option value="">Select Location</option>
-            {% for loc in locality_choices %}
-              <option value="{{ loc.0 }}" {% if request.GET.location == loc.0 %}selected{% endif %}>{{ loc.1 }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-4">
-          <button type="submit" class="btn btn-primary">Filter</button>
+        {% if not district_label %}
+          <div class="col-md-3">
+            <select name="location" class="form-control" aria-label="Location">
+              <option value="">All Locations</option>
+              {% for loc in locality_choices %}
+                <option value="{{ loc.0 }}" {% if request.GET.location == loc.0 %}selected{% endif %}>{{ loc.1 }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-sliders"></i> Filter</button>
         </div>
       </div>
     </form>
 
-    <div class="row">
-      {% for mentor in mentors %}
-        <div class="col-md-3 mb-3">
-          <div class="card mentor">
-            <div class="card-body">
-              <img src="{{ mentor.image.url }}" class="img-fluid mentor-img-personal" alt="{{ mentor.name }}" style="width:100px;height:100px;"/>
-              <hr>
-              <h5 class="card-title">{{ mentor.name }}</h5>
-              <p class="card-text text-capitalize">
-                <strong>Location:</strong> {{ mentor.locality }}
-              </p>
-              <p class="card-text">{{ mentor.about|truncatewords:20 }}</p>
-              <a href="{% url 'mentor:mentor_details' mentor.id %}" class="btn btn-primary text-white">View Details</a>
-            </div>
-          </div>
-        </div>
-      {% empty %}
-        <p>No mentors available.</p>
-      {% endfor %}
-    </div>
-
-    <!-- Pagination -->
-    <nav aria-label="Page navigation">
-      <ul class="pagination justify-content-center">
-        {% if mentors.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?page=1" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ mentors.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
-          </li>
-        {% endif %}
-        {% for num in mentors.paginator.page_range %}
-          {% if mentors.number == num %}
-            <li class="page-item active">
-              <span class="page-link">{{ num }}</span>
-            </li>
-          {% elif num > mentors.number|add:'-3' and num < mentors.number|add:'3' %}
-            <li class="page-item">
-              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-            </li>
-          {% endif %}
+    {% if skill and not district_label %}
+      <div class="district-links mb-4">
+        <span>Near you:</span>
+        {% for loc in locality_choices %}
+          <a class="chip" href="{% url 'mentor:skill_district' skill.id skill.specialist|slugify|default:'skill' loc.0 %}">{{ loc.1 }}</a>
         {% endfor %}
-        {% if mentors.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?page={{ mentors.next_page_number }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
-          </li>
-          <li class="page-item">
-            <a class="page-link" href="?page={{ mentors.paginator.num_pages }}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
+      </div>
+    {% endif %}
+
+    <p class="visually-hidden" aria-live="polite" data-ajax-status></p>
+    <div class="ajax-results" data-ajax-results>
+      {% include 'partials/mentor_results.html' %}
+    </div>
   </div>
 {% endblock %}

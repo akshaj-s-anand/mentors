@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <div class="dash-head">
+      <div class="d-flex align-items-center gap-3">
+        <img src="{{ mentor.image.url }}" alt="" class="dash-avatar" />
+        <div>
+          <h1 class="h3 page-title mb-0">Hi, {{ mentor.name }}</h1>
+          <p class="text-muted mb-0">
+            {% if mentor.verified %}<span class="verified-line"><i class="fa-solid fa-circle-check"></i> Verified</span> · {% endif %}
+            <a href="{{ mentor.get_absolute_url }}">View public profile</a>
+          </p>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'connect:profile_edit' %}" class="btn btn-secondary"><i class="fa-solid fa-user-pen"></i> Edit profile</a>
+        <a href="{% url 'localproj:create_project' %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Post a project</a>
+        <form method="post" action="{% url 'connect:logout' %}">{% csrf_token %}<button class="btn btn-secondary" type="submit"><i class="fa-solid fa-right-from-bracket"></i> Log out</button></form>
+      </div>
+    </div>
+
+    {% if not mentor.has_schedule %}
+      <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <span><i class="fa-regular fa-clock"></i> Set your weekly hours so people can pick a time slot instead of sending a vague request.</span>
+        <a href="{% url 'connect:profile_edit' %}#availability" class="btn btn-secondary btn-sm">Set hours</a>
+      </div>
+    {% endif %}
+
+    <div class="stat-tiles mb-4">
+      <div class="glass-panel"><strong>{{ pending|length }}</strong><span>waiting for you</span></div>
+      <div class="glass-panel"><strong>{{ upcoming|length }}</strong><span>upcoming</span></div>
+      <div class="glass-panel"><strong>{{ stats.completed }}</strong><span>sessions done</span></div>
+      <div class="glass-panel"><strong>{% if stats.rating %}<i class="fa-solid fa-star text-warning"></i> {{ stats.rating }}{% else %}–{% endif %}</strong><span>{{ stats.review_count }} review{{ stats.review_count|pluralize }}</span></div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <section class="glass-panel p-4 mb-4">
+          <h2 class="h5 mb-3">Requests waiting for you</h2>
+          {% for booking in pending %}
+            <div class="list-row">
+              <div>
+                <a href="{% url 'connect:booking_mentor' booking.pk %}" class="fw-semibold">{{ booking.mentee_name }}</a>
+                <span class="text-muted small d-block">{{ booking.get_kind_display }} · {{ booking.when }}</span>
+                <span class="small d-block text-truncate-2">{{ booking.requirement }}</span>
+              </div>
+              <div class="d-flex gap-2 flex-shrink-0">
+                <form method="post" action="{% url 'connect:booking_mentor_action' booking.pk 'accept' %}">{% csrf_token %}<button class="btn btn-primary btn-sm">Accept</button></form>
+                <form method="post" action="{% url 'connect:booking_mentor_action' booking.pk 'decline' %}">{% csrf_token %}<button class="btn btn-secondary btn-sm">Decline</button></form>
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-muted mb-0">No new requests. Share your profile link to get more!</p>
+          {% endfor %}
+        </section>
+
+        <section class="glass-panel p-4 mb-4">
+          <h2 class="h5 mb-3">Upcoming</h2>
+          {% for booking in upcoming %}
+            <a class="list-row list-row-link" href="{% url 'connect:booking_mentor' booking.pk %}">
+              <div>
+                <span class="fw-semibold">{{ booking.mentee_name }}</span>
+                <span class="text-muted small d-block">{{ booking.get_kind_display }} · {{ booking.when }}</span>
+              </div>
+              <i class="fa-solid fa-chevron-right text-muted"></i>
+            </a>
+          {% empty %}
+            <p class="text-muted mb-0">Nothing scheduled.</p>
+          {% endfor %}
+        </section>
+
+        {% if past %}
+          <section class="glass-panel p-4 mb-4">
+            <h2 class="h5 mb-3">Recent</h2>
+            {% for booking in past %}
+              <a class="list-row list-row-link" href="{% url 'connect:booking_mentor' booking.pk %}">
+                <div>
+                  <span class="fw-semibold">{{ booking.mentee_name }}</span>
+                  <span class="text-muted small d-block">{{ booking.when }}</span>
+                </div>
+                {% include 'partials/status.html' with value=booking.status label=booking.get_status_display %}
+              </a>
+            {% endfor %}
+          </section>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-5">
+        <section class="glass-panel p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h5 mb-0">My projects</h2>
+            <a href="{% url 'localproj:create_project' %}" class="small">+ New</a>
+          </div>
+          {% for project in projects %}
+            <a class="list-row list-row-link" href="{% url 'connect:project_manage' project.pk %}">
+              <div>
+                <span class="fw-semibold">{{ project.project_name }}</span>
+                <span class="text-muted small d-block">
+                  {% if not project.status %}Waiting for approval · {% endif %}{{ project.comments.all|length }} proposal{{ project.comments.all|length|pluralize }}
+                </span>
+              </div>
+              {% include 'partials/status.html' with value=project.stage label=project.get_stage_display %}
+            </a>
+          {% empty %}
+            <p class="text-muted mb-0">You haven't posted a project yet.</p>
+          {% endfor %}
+        </section>
+      </div>
+    </div>
+  </div>
+{% endblock %}

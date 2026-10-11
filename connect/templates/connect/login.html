@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Mentor login | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container my-5">
+    <div class="narrow-panel glass-panel p-4 p-md-5 text-center">
+      <span class="icon-bubble"><i class="fa-solid fa-envelope-open-text"></i></span>
+      <h1 class="h3 page-title mt-3">Mentor login</h1>
+      <p class="text-muted">No password needed. Enter the email on your Oldscool profile and we'll send you a login link.</p>
+      <form method="post" class="text-start mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {% for error in form.email.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+        <button type="submit" class="btn btn-primary w-100 mt-3"><i class="fa-solid fa-paper-plane"></i> Email me a login link</button>
+      </form>
+      <p class="small text-muted mt-4 mb-0">Not a mentor yet? <a href="{% url 'mentor:create_mentor' %}">List your profile</a>.</p>
+    </div>
+  </div>
+{% endblock %}

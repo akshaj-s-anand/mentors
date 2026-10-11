@@ -1,0 +1,15 @@
+{# Star rating form. Expects `review_form`, `action` URL and `about` (who is being rated). #}
+<form method="post" action="{{ action }}" class="glass-panel p-4 review-form">
+  {% csrf_token %}
+  <h2 class="h5 mb-1">How was it with {{ about }}?</h2>
+  <p class="text-muted small mb-3">Your rating appears on their public profile.</p>
+  <fieldset class="star-input">
+    <legend class="visually-hidden">Rating</legend>
+    {% for value, label in review_form.fields.rating.choices %}
+      <input type="radio" name="rating" value="{{ value }}" id="star-{{ value }}" required />
+      <label for="star-{{ value }}" title="{{ value }} star{{ value|pluralize }}"><i class="fa-solid fa-star"></i></label>
+    {% endfor %}
+  </fieldset>
+  {{ review_form.comment }}
+  <button type="submit" class="btn btn-primary mt-3"><i class="fa-solid fa-check"></i> Submit review</button>
+</form>

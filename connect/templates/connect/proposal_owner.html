@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Proposal from {{ proposal.name }} | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <a href="{% url 'connect:project_manage' project.pk %}" class="btn btn-secondary mb-4"><i class="fa-solid fa-arrow-left"></i> {{ project.project_name }}</a>
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <section class="glass-panel p-4 p-md-5">
+          <p class="eyebrow">Proposal</p>
+          <h1 class="h3 page-title mb-2">{{ proposal.name }}</h1>
+          {% include 'partials/status.html' with value=proposal.state label=proposal.get_state_display %}
+          <dl class="detail-list mt-4">
+            {% if proposal.proposed_price %}<dt>Price</dt><dd>{{ proposal.proposed_price }}</dd>{% endif %}
+            {% if proposal.timeline %}<dt>Timeline</dt><dd>{{ proposal.timeline }}</dd>{% endif %}
+            <dt>Approach</dt><dd class="text-preline">{{ proposal.response }}</dd>
+            {% if whatsapp %}
+              <dt>Phone</dt><dd>{{ proposal.phone_number }}</dd>
+              <dt>Email</dt><dd><a href="mailto:{{ proposal.email }}">{{ proposal.email }}</a></dd>
+            {% endif %}
+            <dt>Sent</dt><dd>{{ proposal.date_added|date:"d M Y, g:i A" }}</dd>
+          </dl>
+          <div class="d-flex flex-wrap gap-2">
+            {% if proposal.state == 'pending' and project.stage == 'open' %}
+              <form method="post" action="{% url 'connect:proposal_action' proposal.pk 'accept' %}" data-confirm="Hire {{ proposal.name }}? Other pending proposals will be declined.">{% csrf_token %}
+                <button class="btn btn-primary"><i class="fa-solid fa-handshake"></i> Accept &amp; hire</button></form>
+              <form method="post" action="{% url 'connect:proposal_action' proposal.pk 'decline' %}">{% csrf_token %}
+                <button class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Decline</button></form>
+            {% endif %}
+            {% if whatsapp %}
+              <a class="btn btn-whatsapp" href="https://wa.me/{{ whatsapp }}?text={{ 'Hi, this is about my Oldscool project'|urlencode }}" target="_blank" rel="noopener">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+              </a>
+            {% endif %}
+          </div>
+          {% if proposal.state == 'pending' %}
+            <p class="form-text mt-3 mb-0">Their contact details are shown once you accept. Ask questions in the chat first.</p>
+          {% endif %}
+        </section>
+      </div>
+      <div class="col-lg-7">
+        {% include 'partials/chat.html' with other_name=proposal.name %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

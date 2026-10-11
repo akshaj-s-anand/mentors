@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Request from {{ booking.mentee_name }} | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <a href="{% url 'connect:dashboard' %}" class="btn btn-secondary mb-4"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <section class="glass-panel p-4 p-md-5">
+          <p class="eyebrow">{{ booking.get_kind_display }}</p>
+          <h1 class="h3 page-title mb-2">{{ booking.mentee_name }}</h1>
+          {% include 'partials/status.html' with value=booking.status label=booking.get_status_display %}
+
+          <dl class="detail-list mt-4">
+            <dt>When</dt><dd>{{ booking.when }} ({{ booking.duration }} min)</dd>
+            <dt>Needs help with</dt><dd class="text-preline">{{ booking.requirement }}</dd>
+            {% if whatsapp %}
+              <dt>Phone</dt><dd>{{ booking.contact_number }}</dd>
+              <dt>Email</dt><dd><a href="mailto:{{ booking.email }}">{{ booking.email }}</a></dd>
+            {% endif %}
+            <dt>Requested</dt><dd>{{ booking.created_at|date:"d M Y, g:i A" }}</dd>
+          </dl>
+
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            {% if booking.status == 'pending' %}
+              <form method="post" action="{% url 'connect:booking_mentor_action' booking.pk 'accept' %}">{% csrf_token %}
+                <button class="btn btn-primary"><i class="fa-solid fa-check"></i> Accept</button></form>
+              <form method="post" action="{% url 'connect:booking_mentor_action' booking.pk 'decline' %}" data-confirm="Decline this request?">{% csrf_token %}
+                <button class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Decline</button></form>
+            {% elif booking.status == 'accepted' %}
+              <form method="post" action="{% url 'connect:booking_mentor_action' booking.pk 'complete' %}">{% csrf_token %}
+                <button class="btn btn-primary"><i class="fa-solid fa-flag-checkered"></i> Mark as done</button></form>
+              <form method="post" action="{% url 'connect:booking_mentor_action' booking.pk 'cancel' %}" data-confirm="Cancel this booking? {{ booking.mentee_name }} will be notified.">{% csrf_token %}
+                <button class="btn btn-secondary"><i class="fa-solid fa-ban"></i> Cancel</button></form>
+            {% endif %}
+            {% if whatsapp %}
+              <a class="btn btn-whatsapp" href="https://wa.me/{{ whatsapp }}?text={{ 'Hi, this is about your Oldscool booking'|urlencode }}" target="_blank" rel="noopener">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+              </a>
+            {% endif %}
+          </div>
+          {% if booking.status == 'pending' %}
+            <p class="form-text mt-3 mb-0">Their phone and email are shown once you accept. You can chat here before deciding.</p>
+          {% elif booking.status == 'accepted' %}
+            <p class="form-text mt-3 mb-0">After the call, mark it as done and {{ booking.mentee_name }} will be asked to review you.</p>
+          {% endif %}
+        </section>
+      </div>
+      <div class="col-lg-7">
+        {% include 'partials/chat.html' with other_name=booking.mentee_name %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

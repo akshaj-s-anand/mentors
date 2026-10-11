@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %}Your booking with {{ mentor.name }} | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <section class="glass-panel p-4 p-md-5 mb-4">
+          <p class="eyebrow">Your booking</p>
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <img src="{{ mentor.image.url }}" alt="" class="dash-avatar" />
+            <div>
+              <h1 class="h4 mb-0">{{ mentor.name }}</h1>
+              {% if mentor.headline %}<span class="text-muted small">{{ mentor.headline }}</span>{% endif %}
+            </div>
+          </div>
+          {% include 'partials/status.html' with value=booking.status label=booking.get_status_display %}
+
+          <ol class="progress-steps mt-4">
+            <li class="done">Request sent</li>
+            <li class="{% if booking.status == 'accepted' or booking.status == 'completed' %}done{% elif booking.status == 'declined' or booking.status == 'cancelled' %}stopped{% endif %}">
+              {% if booking.status == 'declined' %}Declined{% elif booking.status == 'cancelled' %}Cancelled{% else %}Mentor accepts{% endif %}
+            </li>
+            <li class="{% if booking.status == 'completed' %}done{% endif %}">Session done</li>
+            <li class="{% if booking.review %}done{% endif %}">Review</li>
+          </ol>
+
+          <dl class="detail-list">
+            <dt>Type</dt><dd>{{ booking.get_kind_display }} ({{ booking.duration }} min)</dd>
+            <dt>When</dt><dd>{{ booking.when }}</dd>
+            <dt>Your note</dt><dd class="text-preline">{{ booking.requirement }}</dd>
+            {% if booking.kind == 'session' and mentor.price_per_session %}
+              <dt>Price</dt><dd>₹{{ mentor.price_per_session }}, paid directly to {{ mentor.name }}</dd>
+            {% endif %}
+          </dl>
+
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            {% if whatsapp %}
+              <a class="btn btn-whatsapp" href="https://wa.me/{{ whatsapp }}?text={{ 'Hi, this is about my Oldscool booking'|urlencode }}" target="_blank" rel="noopener">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp {{ mentor.name }}
+              </a>
+            {% endif %}
+            <a class="btn btn-secondary" href="{{ mentor.get_absolute_url }}#book"><i class="fa-solid fa-rotate-right"></i> Book again</a>
+            {% if booking.status == 'pending' or booking.status == 'accepted' %}
+              <form method="post" action="{% url 'connect:booking_client_cancel' booking.token %}" data-confirm="Cancel this booking?">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-secondary"><i class="fa-solid fa-xmark"></i> Cancel</button>
+              </form>
+            {% endif %}
+          </div>
+          {% if booking.status == 'pending' %}
+            <p class="form-text mt-3 mb-0">Their WhatsApp number appears here once they accept. Bookmark this page, or use the link we emailed you.</p>
+          {% endif %}
+        </section>
+
+        {% if review_form %}
+          {% url 'connect:booking_client_review' booking.token as review_action %}
+          {% include 'partials/review_form.html' with action=review_action about=mentor.name %}
+        {% elif booking.review %}
+          <section class="glass-panel p-4">
+            <p class="mb-1"><strong>Your review</strong></p>
+            <span class="review-stars">{% for i in "12345" %}<i class="fa-{% if forloop.counter <= booking.review.rating %}solid{% else %}regular{% endif %} fa-star"></i>{% endfor %}</span>
+            {% if booking.review.comment %}<p class="mb-0 mt-2">{{ booking.review.comment }}</p>{% endif %}
+          </section>
+        {% endif %}
+      </div>
+
+      <div class="col-lg-7">
+        {% include 'partials/chat.html' with other_name=mentor.name %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

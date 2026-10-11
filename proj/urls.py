@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include('home.urls')),
     path('mentor/', include('mentor.urls')),
     path('project/', include('localproj.urls')),
+    path('', include('connect.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,6 @@
+{# Star rating. Expects `rating` (number or None) and optional `count`. #}
+{% if rating %}
+  <span class="stars" title="Rated {{ rating|floatformat:1 }} out of 5{% if count %} from {{ count }} review{{ count|pluralize }}{% endif %}">
+    <i class="fa-solid fa-star" aria-hidden="true"></i> {{ rating|floatformat:1 }}{% if count %} <span class="stars-count">({{ count }})</span>{% endif %}
+  </span>
+{% endif %}

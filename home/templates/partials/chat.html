@@ -1,0 +1,20 @@
+{% comment %}
+  On-site chat for one booking/proposal. Expects `chat_url` (JSON endpoint) and `other_name`.
+  script.js loads the messages, polls for new ones and posts replies.
+{% endcomment %}
+<section class="glass-panel chat" data-chat="{{ chat_url }}" id="chat">
+  <header class="chat-header">
+    <span><i class="fa-regular fa-comments" aria-hidden="true"></i> Chat with {{ other_name }}</span>
+    <span class="chat-live" title="Updates automatically"><span></span> live</span>
+  </header>
+  <div class="chat-log" data-chat-log aria-live="polite">
+    <p class="chat-empty" data-chat-empty>No messages yet. Say hello!</p>
+  </div>
+  <form class="chat-form" data-chat-form>
+    {% csrf_token %}
+    <label class="visually-hidden" for="chat-body">Message</label>
+    <textarea id="chat-body" name="body" rows="1" maxlength="2000" class="form-control" placeholder="Write a message…" required></textarea>
+    <button class="btn btn-primary" type="submit" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
+  </form>
+  <p class="chat-closed" data-chat-closed hidden>This conversation is closed.</p>
+</section>

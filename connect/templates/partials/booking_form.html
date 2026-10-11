@@ -1,0 +1,98 @@
+{% comment %}
+  Booking request form on a mentor's profile. Expects `mentor`, `form` (BookingForm), `date_min`, `date_max`.
+  With a schedule, script.js loads free slots for the chosen date from connect:slots.
+{% endcomment %}
+<form method="post" action="{% url 'connect:book' mentor.pk %}" class="glass-panel p-4 p-md-5 mb-4 booking-form" id="book"
+      data-booking data-slots-url="{% url 'connect:slots' mentor.pk %}" novalidate>
+  {% csrf_token %}
+  <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h2 class="h4 mb-1">Book a call with {{ mentor.name }}</h2>
+      <p class="text-muted small mb-0">
+        {% if mentor.price_per_session %}
+          Sessions are ₹{{ mentor.price_per_session }} for {{ mentor.session_minutes }} min, paid directly to the mentor.
+        {% else %}
+          Sessions are free.
+        {% endif %}
+        You'll get a private link to track your request.
+      </p>
+    </div>
+  </div>
+
+  {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+
+  <!-- 1. What kind of call -->
+  <fieldset class="mb-4">
+    <legend class="form-label">What would you like?</legend>
+    <div class="choice-cards">
+      {% if mentor.free_intro %}
+        <label class="choice-card">
+          <input type="radio" name="kind" value="intro" {% if form.kind.value == 'intro' or not form.kind.value %}checked{% endif %} />
+          <span class="choice-title"><i class="fa-solid fa-gift"></i> Free intro call</span>
+          <span class="choice-sub">15 min · get to know each other</span>
+        </label>
+      {% endif %}
+      <label class="choice-card">
+        <input type="radio" name="kind" value="session" {% if form.kind.value == 'session' or not mentor.free_intro %}checked{% endif %} />
+        <span class="choice-title"><i class="fa-solid fa-chalkboard-user"></i> Mentoring session</span>
+        <span class="choice-sub">{{ mentor.session_minutes }} min · {% if mentor.price_per_session %}₹{{ mentor.price_per_session }}{% else %}free{% endif %}</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- 2. When -->
+  <div class="row g-3 mb-2">
+    <div class="col-md-5">
+      <label class="form-label" for="id_date">Date</label>
+      <input type="date" name="date" id="id_date" class="form-control" min="{{ date_min }}" max="{{ date_max }}"
+             value="{{ form.date.value|default_if_none:''|stringformat:'s' }}" required data-booking-date />
+      {% for error in form.date.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-md-7">
+      {% if mentor.has_schedule %}
+        <span class="form-label d-block" id="slot-label">Time</span>
+        <div class="slot-grid" data-slot-list role="radiogroup" aria-labelledby="slot-label"
+             data-selected="{{ form.start_time.value|default_if_none:''|stringformat:'s'|slice:':5' }}">
+          <p class="slot-hint">Pick a date to see free times.</p>
+        </div>
+        {% for error in form.start_time.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+      {% else %}
+        <label class="form-label" for="id_preferred_time">Preferred time</label>
+        <input type="text" name="preferred_time" id="id_preferred_time" class="form-control" maxlength="60"
+               placeholder="e.g. weekday evenings after 6" value="{{ form.preferred_time.value|default:'' }}" />
+        <p class="form-text">{{ mentor.name }} hasn't set fixed hours yet and will confirm a time with you.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 3. About you -->
+  <div class="row g-3 mt-1">
+    <div class="col-md-4">
+      <label class="form-label" for="id_mentee_name">Your name</label>
+      <input type="text" name="mentee_name" id="id_mentee_name" class="form-control" maxlength="100" autocomplete="name"
+             value="{{ form.mentee_name.value|default:'' }}" required />
+      {% for error in form.mentee_name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-md-4">
+      <label class="form-label" for="id_email">Email</label>
+      <input type="email" name="email" id="id_email" class="form-control" autocomplete="email"
+             value="{{ form.email.value|default:'' }}" required />
+      {% for error in form.email.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-md-4">
+      <label class="form-label" for="id_contact_number">Phone / WhatsApp</label>
+      <input type="tel" name="contact_number" id="id_contact_number" class="form-control" autocomplete="tel" inputmode="numeric"
+             maxlength="15" value="{{ form.contact_number.value|default:'' }}" required />
+      {% for error in form.contact_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+    </div>
+    <div class="col-12">
+      <label class="form-label" for="id_requirement">What do you need help with?</label>
+      <textarea name="requirement" id="id_requirement" class="form-control" rows="3" maxlength="1000" required
+                placeholder="A few lines so {{ mentor.name }} can prepare">{{ form.requirement.value|default:'' }}</textarea>
+      {% for error in form.requirement.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-4"><i class="fa-solid fa-paper-plane"></i> Send request</button>
+  <p class="form-text mt-2 mb-0"><i class="fa-solid fa-lock"></i> Your phone number is only shared with {{ mentor.name }} if they accept.</p>
+</form>

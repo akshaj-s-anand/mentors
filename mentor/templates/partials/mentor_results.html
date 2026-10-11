@@ -1,0 +1,47 @@
+{# Results grid + "load more" footer. Rendered inside all_mentors.html, and on its own for AJAX requests. #}
+<div class="row g-4 mb-4" data-card-grid>
+  {% for mentor in mentors %}
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+      <div class="card mentor h-100">
+        <div class="card-body">
+          <div class="mentor-avatar">
+            <img src="{{ mentor.image.url }}" class="img-fluid mentor-img-personal" alt="{{ mentor.name }}" loading="lazy" />
+            {% if mentor.verified %}
+              <span class="verified-badge" title="Verified by Oldscool"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span class="visually-hidden">Verified by Oldscool</span></span>
+            {% endif %}
+          </div>
+          <h5 class="card-title text-center mb-1">{{ mentor.name }}</h5>
+          {% if mentor.headline %}<p class="mentor-headline">{{ mentor.headline }}</p>{% endif %}
+          <div class="mentor-meta">
+            <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ mentor.get_locality_display }}</span>
+            {% include 'partials/stars.html' with rating=mentor.avg_rating count=mentor.review_count %}
+          </div>
+          {% with specs=mentor.specializations.all %}
+            {% if specs %}
+              <div class="skill-chips">
+                {% for spec in specs|slice:":3" %}
+                  <a class="chip" href="{% url 'mentor:skill' spec.id spec.specialist|slugify|default:'skill' %}">{{ spec.specialist }}</a>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+          {% if mentor.about %}<p class="card-text">{{ mentor.about|truncatewords:16 }}</p>{% endif %}
+          <div class="mentor-offer">
+            {% if mentor.free_intro %}<span class="pill pill-green"><i class="fa-solid fa-gift" aria-hidden="true"></i> Free intro</span>{% endif %}
+            {% if mentor.price_per_session %}<span class="pill">₹{{ mentor.price_per_session }}/session</span>{% endif %}
+          </div>
+          <a href="{{ mentor.get_absolute_url }}" class="btn btn-primary w-100">View profile <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="glass-panel p-5 text-center">
+        <p class="mb-3">No mentors match these filters.</p>
+        <a href="{% url 'mentor:all_mentor' %}" class="btn btn-secondary" data-ajax-link>Clear filters</a>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
+{% include 'partials/load_more.html' with noun='mentors' %}

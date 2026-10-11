@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Your proposal for {{ project.project_name }} | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container mt-5">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <section class="glass-panel p-4 p-md-5 mb-4">
+          <p class="eyebrow">Your proposal</p>
+          <h1 class="h4 page-title mb-1">{{ project.project_name }}</h1>
+          <p class="text-muted small mb-2">Posted by {{ owner.name }}</p>
+          {% include 'partials/status.html' with value=proposal.state label=proposal.get_state_display %}
+          {% if proposal.state == 'accepted' %}
+            {% include 'partials/status.html' with value=project.stage label=project.get_stage_display %}
+          {% endif %}
+
+          <dl class="detail-list mt-4">
+            {% if proposal.proposed_price %}<dt>Your price</dt><dd>{{ proposal.proposed_price }}</dd>{% endif %}
+            {% if proposal.timeline %}<dt>Timeline</dt><dd>{{ proposal.timeline }}</dd>{% endif %}
+            <dt>Your approach</dt><dd class="text-preline">{{ proposal.response }}</dd>
+          </dl>
+
+          <div class="d-flex flex-wrap gap-2">
+            {% if whatsapp %}
+              <a class="btn btn-whatsapp" href="https://wa.me/{{ whatsapp }}?text={{ 'Hi, this is about your Oldscool project'|urlencode }}" target="_blank" rel="noopener">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp {{ owner.name }}
+              </a>
+            {% endif %}
+            <a class="btn btn-secondary" href="{% url 'localproj:project_details' project.pk %}"><i class="fa-regular fa-eye"></i> Project page</a>
+          </div>
+          {% if proposal.state == 'pending' %}
+            <p class="form-text mt-3 mb-0">You'll get an email when {{ owner.name }} decides. Questions? Use the chat.</p>
+          {% elif proposal.state == 'declined' %}
+            <p class="form-text mt-3 mb-0">The owner went another way this time. <a href="{% url 'localproj:all_projects' %}">Browse other projects</a>.</p>
+          {% endif %}
+        </section>
+
+        {% if milestones %}
+          <section class="glass-panel p-4 mb-4">
+            <h2 class="h5 mb-3">Milestones</h2>
+            {% for milestone in milestones %}
+              <div class="milestone {% if milestone.done %}is-done{% endif %}">
+                <i class="milestone-check fa-{% if milestone.done %}solid fa-circle-check{% else %}regular fa-circle{% endif %}"></i>
+                <div>
+                  <span class="milestone-title">{{ milestone.title }}</span>
+                  {% if milestone.due_date %}<span class="text-muted small d-block">Due {{ milestone.due_date|date:"d M Y" }}</span>{% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </section>
+        {% endif %}
+
+        {% if review_form %}
+          {% url 'connect:proposal_client_review' proposal.token as review_action %}
+          {% include 'partials/review_form.html' with action=review_action about=owner.name %}
+        {% endif %}
+      </div>
+      <div class="col-lg-7">
+        {% include 'partials/chat.html' with other_name=owner.name %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

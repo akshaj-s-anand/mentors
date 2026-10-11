@@ -1,0 +1,22 @@
+{% comment %}
+  Infinite-scroll footer. Expects page_obj, filter_query and `noun` (e.g. "mentors").
+  The "Load more" link is a real URL, so it works without JavaScript; script.js
+  loads the next page automatically when this footer scrolls into view.
+{% endcomment %}
+<div class="load-more" data-load-more {% if page_obj.has_next %}data-next-url="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}"{% endif %}>
+  {% if page_obj.paginator.count %}
+    <p class="results-meta">
+      Showing <strong>{{ page_obj.end_index }}</strong> of <strong>{{ page_obj.paginator.count }}</strong> {{ noun }}
+    </p>
+  {% endif %}
+
+  {% if page_obj.has_next %}
+    <div class="load-more-spinner" aria-hidden="true"><span></span><span></span><span></span></div>
+    <p class="load-more-error" role="alert">Couldn't load more {{ noun }}. Check your connection and try again.</p>
+    <a class="btn btn-secondary load-more-btn" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">
+      Load more {{ noun }}
+    </a>
+  {% elif page_obj.paginator.num_pages > 1 %}
+    <p class="load-more-end">You've reached the end <i class="fa-solid fa-circle-check"></i></p>
+  {% endif %}
+</div>

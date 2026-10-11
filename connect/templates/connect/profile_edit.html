@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Edit profile | The Old School{% endblock %}
+{% block navigation %}{% include 'nav.html' %}{% endblock %}
+{% block homebanner %}
+  <div class="container my-5">
+    <a href="{% url 'connect:dashboard' %}" class="btn btn-secondary mb-4"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+    <form method="post" enctype="multipart/form-data" class="glass-panel p-4 p-md-5">
+      {% csrf_token %}
+      <h1 class="h3 page-title mb-4">Edit your profile</h1>
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors|join:" " }}</div>{% endif %}
+
+      <h2 class="form-section">Profile</h2>
+      <div class="row g-3">
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.name %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.headline %}</div>
+        <div class="col-12">{% include 'partials/field.html' with field=form.about %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.qualification %}</div>
+        <div class="col-md-3 col-6">{% include 'partials/field.html' with field=form.experience %}</div>
+        <div class="col-md-3 col-6">{% include 'partials/field.html' with field=form.locality %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.languages %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.image %}</div>
+      </div>
+
+      <h2 class="form-section">Skills</h2>
+      <p class="form-text mt-0">Hold Ctrl (Cmd on Mac) to pick more than one. Skills appear as tags on your card and link to skill pages.</p>
+      <div class="row g-3">
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.categories %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.specializations %}</div>
+      </div>
+
+      <h2 class="form-section" id="availability">Availability</h2>
+      <p class="form-text mt-0">Visitors pick a free slot inside these hours. Leave the days empty to take requests without fixed times.</p>
+      <div class="row g-3">
+        <div class="col-md-3 col-6">{% include 'partials/field.html' with field=form.start_weekday %}</div>
+        <div class="col-md-3 col-6">{% include 'partials/field.html' with field=form.end_weekday %}</div>
+        <div class="col-md-2 col-6">{% include 'partials/field.html' with field=form.time_from %}</div>
+        <div class="col-md-2 col-6">{% include 'partials/field.html' with field=form.time_to %}</div>
+        <div class="col-md-2">{% include 'partials/field.html' with field=form.session_minutes %}</div>
+      </div>
+
+      <h2 class="form-section">Pricing</h2>
+      <div class="row g-3 align-items-end">
+        <div class="col-md-6">
+          <div class="form-check form-switch">
+            {{ form.free_intro }}
+            <label class="form-check-label" for="{{ form.free_intro.id_for_label }}">Offer a free 15-minute intro call</label>
+          </div>
+        </div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.price_per_session %}</div>
+      </div>
+
+      <h2 class="form-section">Contact &amp; links</h2>
+      <div class="row g-3">
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.contact %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.linkedin %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.instagram %}</div>
+        <div class="col-md-6">{% include 'partials/field.html' with field=form.Facebook %}</div>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-4"><i class="fa-solid fa-check"></i> Save profile</button>
+    </form>
+  </div>
+{% endblock %}

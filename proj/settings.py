@@ -16,17 +16,23 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
+# Secrets and per-environment values come from environment variables.
+# Local development works with no variables set; production must set them.
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-6+=0@#tl6!&g%=jp_w!l^io1hf9=!$e$t5o8$(6r3*qwl55v2-'
+# SECURITY WARNING: set DJANGO_DEBUG=0 in production
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise RuntimeError('DJANGO_SECRET_KEY must be set when DEBUG is off.')
+    SECRET_KEY = 'django-insecure-local-development-only'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1' if DEBUG else 'theoldscool.com,www.theoldscool.com'
+).split(',')
+CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if host not in ('localhost', '127.0.0.1')]
 
 
 # Application definition
@@ -41,6 +47,7 @@ INSTALLED_APPS = [
     'home',
     'mentor',
     'localproj',
+    'connect',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +65,7 @@ ROOT_URLCONF = 'proj.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -66,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'connect.context_processors.mentor',
             ],
         },
     },
@@ -127,13 +135,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-print(STATICFILES_DIRS)
+
 # Media files settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# MEDIA_URL = os.path.join('/media/')
-# MEDIA_ROOT = os.path.join(BASE_DIR, '../project/media/')
-# MEDIA_ROOT = os.path.join(BASE_DIR, '../futurefounder/media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -141,10 +146,42 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'mail.theoldscool.com'  # Update with your actual SMTP host
-EMAIL_PORT = 465  # Update with your SMTP port
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'mail.theoldscool.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'admin@theoldscool.com'  # Update with your SMTP username
-EMAIL_HOST_PASSWORD = '8swSsaY8xcjR'  # Update with your SMTP password
+EMAIL_TIMEOUT = 10  # don't let a slow mail server hang the request
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'admin@theoldscool.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+# must match the authenticated mailbox, or mail servers reject/spam-flag it
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+# where enquiries are copied for the site team
+SITE_NOTIFY_EMAIL = os.environ.get('SITE_NOTIFY_EMAIL', 'oldscool.contact@gmail.com')
+
+# without a password, print emails to the console instead of failing to send
+EMAIL_BACKEND = (
+    'django.core.mail.backends.smtp.EmailBackend' if EMAIL_HOST_PASSWORD
+    else 'django.core.mail.backends.console.EmailBackend'
+)
+
+# Production hardening (only applies with DEBUG off)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 60 * 60 * 24 * 30
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = 'same-origin'
+    # cache-busting file names (styles.abc123.css) so browsers can cache static files forever
+    STORAGES = {
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'},
+    }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {'console': {'class': 'logging.StreamHandler'}},
+    'root': {'handlers': ['console'], 'level': 'INFO'},
+}
 

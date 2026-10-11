@@ -1,6 +1,5 @@
 from mentor.models import Mentors, Category, Specialization
 from django import forms
-from datetime import datetime
 
 class CreateMentorForm(forms.ModelForm):
     class Meta:

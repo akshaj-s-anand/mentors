@@ -6,68 +6,62 @@ Center | The Old Scool {% endblock %}
 <!-- navigation bar ends -->
 
 <!-- home banner section starts -->
-<!-- circles starts -->
 {% block homebanner %}
-<div class="green-circle gc-1-pos"></div>
-<div class="orange-circle oc-1-pos"></div>
-<div class="green-circle gc-2-pos"></div>
-<div class="orange-circle oc-2-pos"></div>
-<hr style="margin: 0" />
-<!-- circles ends -->
-<div class="container mt-5">
-  <div class="row">
-    <div class="col-md-8">
-      <div>
-        <div class="d-flex flex-column">
-          <h1 class="primary-h1 visible" id="text1">
+<div class="container hero mt-4">
+  <div class="row g-4 g-lg-5 align-items-start">
+    <div class="col-lg-8">
+      <!-- hero slider: headline N and sub-line N always change together -->
+      <div class="hero-slider" id="heroSlider" data-interval="4500" aria-roledescription="carousel" aria-label="Highlights">
+        <div class="headline-rotator">
+          <h1 class="primary-h1 visible">
             Grow <br />
             Your Business <br /><span class="green-text">Locally</span>
           </h1>
-          <h1 class="primary-h1" id="text2" style="display: none">
+          <h1 class="primary-h1" aria-hidden="true">
             Build A <br />
             Career Near Your <br /><span class="green-text">Home</span>
           </h1>
-          <h1 class="primary-h1" id="text3" style="display: none">
+          <h1 class="primary-h1" aria-hidden="true">
             Get Local<br />Professional
-             <br /><span class="green-text">Mentorship</span>
+            <br /><span class="green-text">Mentorship</span>
           </h1>
         </div>
-      </div>
-      <div>
-        <div class="d-flex flex-column">
-          <p class="primary-p" id="text">
+        <div class="subline-rotator" aria-live="polite">
+          <p class="primary-p visible">
+            Promote local community engagement by enabling people to work
+            within their own nearby areas.
+          </p>
+          <p class="primary-p" aria-hidden="true">
             Explore unfamiliar territory, embrace diverse cultures, and discover
             opportunities that ignite your creativity.
           </p>
+          <p class="primary-p" aria-hidden="true">
+            Learn from experienced professionals in your own neighbourhood and
+            get guidance that fits your goals.
+          </p>
+        </div>
+        <div class="hero-dots">
+          <button type="button" class="active" aria-label="Show slide 1" aria-current="true"></button>
+          <button type="button" aria-label="Show slide 2"></button>
+          <button type="button" aria-label="Show slide 3"></button>
         </div>
       </div>
-      <div>
-        <div class="d-flex left-padding-20 w-100">
-          <div class="row w-100">
-            <div class="col-lg">
-              <a href="{% url 'home:enroll' %}" class="green-btn text-center"
-                >Enroll Now</a
-              >
-              <a
-                href="{% url 'home:tearms_and_conditions' %}"
-                class="orange-btn text-center"
-                >Learn More</a
-              >
-            </div>
-          </div>
-        </div>
+      <div class="hero-actions">
+        <a href="{% url 'home:enroll' %}" class="green-btn">Enroll Now <i class="fa-solid fa-arrow-right"></i></a>
+        <a href="{% url 'home:tearms_and_conditions' %}" class="orange-btn">Learn More</a>
       </div>
-      <div class="mt-5 d-flex flex-column">
+
+      <div class="mt-4">
         <div
           id="projectCarousel"
           class="carousel slide carousel-fade"
-          data-ride="carousel"
-          data-interval="5000"
+          data-bs-ride="carousel"
+          data-bs-interval="5000"
         >
           <div class="carousel-inner">
             {% for project in projects %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                  <div class="border rounded p-5 project">
+                  <div class="card project">
                     <h5>{{ project.project_name }}</h5>
                     <p>{{ project.description|default:'No description available.'|truncatewords:40 }}</p>
                   </div>
@@ -76,45 +70,47 @@ Center | The Old Scool {% endblock %}
           </div>
         </div>
       </div>
-      <form method="get" action="{% url 'localproj:all_projects' %}" class="col-md-8 w-100 mt-2 get-form-project">
-          <select name="project_name" class="col-3">
+      <form method="get" action="{% url 'localproj:all_projects' %}" class="search-bar glass">
+          <select name="project_name" aria-label="Project name">
             <option value="">Select Project Name</option>
             {% for name in project_names %}
               <option value="{{ name }}">{{ name }}</option>
             {% endfor %}
           </select>
-          <select name="location" class="col-3">
+          <select name="location" aria-label="Project location">
             <option value="">Select Location</option>
             {% for locality in locality_choices_proj %}
               <option value="{{ locality.0 }}">{{ locality.1 }}</option>
             {% endfor %}
           </select>
-          <button type="submit" class="get-btn-project col-3">Search</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
         </form>
     </div>
-    <!-- card caurosel starts -->
 
-    <div class="col-md-3">
+    <!-- card caurosel starts -->
+    <div class="col-lg-4 col-md-8 mx-auto">
       <div
         id="cardCarousel"
         class="carousel slide carousel-fade"
-        data-ride="carousel"
-        data-interval="5000"
+        data-bs-ride="carousel"
+        data-bs-interval="5000"
       >
         <div class="carousel-inner">
           {% for mentor in mentors %}
           <div class="carousel-item {% if forloop.first %}active{% endif %}">
-            <div class="card">
+            <div class="card mentor-card">
               {% if mentor.image %}
-              <img
-                src="{{ mentor.image.url }}"
-                class="card-img-top mentor-img"
-                alt="{{ mentor.name }}"
-              />
+              <div class="overflow-hidden">
+                <img
+                  src="{{ mentor.image.url }}"
+                  class="card-img-top mentor-img"
+                  alt="{{ mentor.name }}"
+                />
+              </div>
               {% endif %}
               <div class="card-body">
                 <h5 class="card-title h5">{{ mentor.name }}</h5>
-                <p class="card-text">
+                <p class="card-text mb-0">
                   {{ mentor.specializations.all|slice:":3"|join:", " }}
                 </p>
               </div>
@@ -127,21 +123,21 @@ Center | The Old Scool {% endblock %}
       <form
         method="get"
         action="{% url 'mentor:all_mentor' %}"
-        class="d-flex flex-column w-100 justify-content-between get-form"
+        class="d-flex flex-column w-100 get-form glass p-3"
       >
-        <select name="category" id="categorySelect">
+        <select name="category" id="categorySelect" aria-label="Mentor category">
           <option value="">Select Category</option>
           {% for category in categories %}
           <option value="{{ category.id }}">{{ category.name }}</option>
           {% endfor %}
         </select>
-        <select name="location" id="locationSelect">
+        <select name="location" id="locationSelect" aria-label="Mentor location">
           <option value="">Select Location</option>
           {% for locality in locality_choices_mentor %}
           <option value="{{ locality.0 }}">{{ locality.1 }}</option>
           {% endfor %}
         </select>
-        <button type="submit" class="btn btn-success">Search</button>
+        <button type="submit" class="btn btn-success"><i class="fa-solid fa-user-tie"></i> Find a Mentor</button>
       </form>
     </div>
     <!-- column ends -->
@@ -152,61 +148,58 @@ Center | The Old Scool {% endblock %}
 
 {% block sectiononehome %}
 <!-- section two starts -->
-<section class="container mt-5">
+<section class="container mt-5 pt-lg-4">
   <!-- this section is for registering a new mentor or project in the website -->
-  <h2 class="secondary-h1 visible d-flex justify-content-center w-100">
-    Hey Future Founders!!
-  </h2>
-  <div class="row">
-    <div
-      class="col-md-6"
-      data-link="{% url 'mentor:create_mentor' %}"
-      style="cursor: pointer"
-    >
-      <div class="d-flex flex-column border p-5 rounded mx-auto project-grid">
+  <h2 class="secondary-h1 section-title">Hey Future Founders!!</h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div
+        class="d-flex flex-column project-grid link-card"
+        data-link="{% url 'mentor:create_mentor' %}"
+      >
         <img
           src="{% static 'images/icon.svg' %}"
           alt=""
-          width="100px"
-          style="margin-bottom: 30px"
+          width="90"
+          style="margin-bottom: 24px"
         />
         <h3>List your profile</h3>
         <p>
           Boost visibility, connect with clients, and showcase expertise
           effectively.
         </p>
+        <a class="arrow text-decoration-none" href="{% url 'mentor:create_mentor' %}">Get started <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
-    <div
-      class="col-md-6"
-      data-link="{% url 'localproj:create_project' %}"
-      style="cursor: pointer"
-    >
-      <div class="d-flex flex-column border p-5 rounded mx-auto project-grid">
+    <div class="col-md-6">
+      <div
+        class="d-flex flex-column project-grid link-card"
+        data-link="{% url 'localproj:create_project' %}"
+      >
         <img
           src="{% static 'images/proj-icon.svg' %}"
           alt=""
-          width="100px"
-          style="margin-bottom: 30px"
+          width="90"
+          style="margin-bottom: 24px"
         />
         <h3>Post your Project</h3>
         <p>
           Increase collaboration opportunities, gain feedback, and attract
           potential clients.
         </p>
+        <a class="arrow text-decoration-none" href="{% url 'localproj:create_project' %}">Post now <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
   </div>
 </section>
 <!-- section two ends -->
 {% endblock %} {% block sectiontwohome %}
-<section class="container mt-5">
-  <h2 class="secondary-h1 visible d-flex justify-content-center w-100">
-    How Do Our Connected Spaces Work?
-  </h2>
-  <div class="row">
-    <div class="col-md-3">
-      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+<section class="container mt-5 pt-lg-4">
+  <h2 class="secondary-h1 section-title">How Do Our Connected Spaces Work?</h2>
+  <div class="row g-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="project-grid">
+        <span class="feature-num">01</span>
         <h2>LOCAL FOCUS</h2>
         <p>
           We believe in the power of local communities. By connecting
@@ -216,8 +209,9 @@ Center | The Old Scool {% endblock %}
         </p>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+    <div class="col-sm-6 col-lg-3">
+      <div class="project-grid">
+        <span class="feature-num">02</span>
         <h2>DIVERSE TALENT POOL</h2>
         <p>
           Whether you’re a graphic designer, web developer, writer, marketer, or
@@ -227,8 +221,9 @@ Center | The Old Scool {% endblock %}
         </p>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+    <div class="col-sm-6 col-lg-3">
+      <div class="project-grid">
+        <span class="feature-num">03</span>
         <h2>EFFORTLESS CONNECTION</h2>
         <p>
           Say goodbye to endless searches and complicated hiring processes. With
@@ -238,8 +233,9 @@ Center | The Old Scool {% endblock %}
         </p>
       </div>
     </div>
-    <div class="col-md-3">
-      <div class="rounded border p-4 border project-grid mt-3 min-height-320">
+    <div class="col-sm-6 col-lg-3">
+      <div class="project-grid">
+        <span class="feature-num">04</span>
         <h2>SUPPORTIVE COMMUNITY</h2>
         <p>
           Joining Oldscool means becoming part of a supportive community of
@@ -252,16 +248,16 @@ Center | The Old Scool {% endblock %}
   </div>
 </section>
 {% endblock %} {% block sectionthreehome %}
-<section class="container mt-5">
-  <h2 class="secondary-h1 visible d-flex justify-content-center w-100">
+<section class="container mt-5 pt-lg-4">
+  <h2 class="secondary-h1 section-title mb-3">
     Join Oldscool Today & Start Making Local Connections!
   </h2>
-  <div class="d-flex justify-content-center">
-    <a href="https://wa.me/919980217121" target="_blank"
-      ><i class="fa-brands fa-square-whatsapp social-icons"></i
+  <div class="social-links" data-reveal>
+    <a href="https://wa.me/919980217121" target="_blank" rel="noopener" class="glass" aria-label="Chat on WhatsApp"
+      ><i class="fa-brands fa-whatsapp social-icons"></i
     ></a>
-    <a href="tel:+919980217121" target="_blank"
-      ><i class="fa-solid fa-phone-volume social-icons" data-link="#"></i
+    <a href="tel:+919980217121" class="glass" aria-label="Call us"
+      ><i class="fa-solid fa-phone-volume social-icons"></i
     ></a>
   </div>
 </section>

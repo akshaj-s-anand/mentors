@@ -1,65 +1,112 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-  {{ project.project_name }} | The Old Scool
+  {{ project.project_name }} | The Old School
 {% endblock %}
+{% block meta_description %}{{ project.project_name }} in {{ project.location }}. {{ project.description|truncatewords:25 }}{% endblock %}
 {% block navigation %}
   {% include 'nav.html' %}
-  <hr />
 {% endblock %}
 {% block homebanner %}
-  {% if messages %}
-    <div class="container mt-3">
-      {% for message in messages %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
   <div class="container mt-5">
-    <div class="card">
-      <div class="card-header bg-primary-green">
-        <h1 class="card-title">{{ project.project_name }}</h1>
+    <a href="{% url 'localproj:all_projects' %}" class="btn btn-secondary mb-4"><i class="fa-solid fa-arrow-left"></i> All projects</a>
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header">
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              {% include 'partials/status.html' with value=project.stage label=project.get_stage_display %}
+              <span class="status-pill status-neutral"><i class="fa-regular fa-file-lines"></i> {{ proposal_count }} proposal{{ proposal_count|pluralize }}</span>
+            </div>
+            <h1 class="card-title page-title mb-0">{{ project.project_name }}</h1>
+            <p class="text-muted mb-0 mt-1">Posted by <a href="{{ project.posted_by.get_absolute_url }}">{{ project.posted_by.name }}</a></p>
+          </div>
+          <div class="card-body p-4 p-md-5">
+            <div class="row g-3 mb-4">
+              <div class="col-sm-4">
+                <div class="glass-panel glass-strong p-3 h-100">
+                  <small class="text-muted d-block"><i class="fa-solid fa-indian-rupee-sign me-1"></i> Budget</small>
+                  <strong>{{ project.budget|default:"Open to offers" }}</strong>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="glass-panel glass-strong p-3 h-100">
+                  <small class="text-muted d-block"><i class="fa-solid fa-location-dot me-1"></i> Location</small>
+                  <strong>{{ project.location }}</strong>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="glass-panel glass-strong p-3 h-100">
+                  <small class="text-muted d-block"><i class="fa-regular fa-calendar-check me-1"></i> Deadline</small>
+                  <strong>{{ project.end_date|default:"Flexible" }}</strong>
+                </div>
+              </div>
+            </div>
+            {% with skills=project.skills.all %}
+              {% if skills %}
+                <div class="skill-chips mb-3">
+                  {% for spec in skills %}<a class="chip" href="{% url 'mentor:skill' spec.id spec.specialist|slugify|default:'skill' %}">{{ spec.specialist }}</a>{% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+            <p class="card-text text-preline mb-0">{{ project.description }}</p>
+          </div>
+        </div>
       </div>
-      <div class="card-body">
-        <p>
-          <strong>Location:</strong> {{ project.location }}
-        </p>
-        <p>
-          <strong>Start Date:</strong> {{ project.start_date }}
-        </p>
-        <p>
-          <strong>End Date:</strong> {{ project.end_date }}
-        </p>
-        <p>{{ project.description }}</p>
-        <hr />
 
-        <!-- Form for adding a comment -->
-        <form method="POST" action="{% url 'localproj:add_comment' project.id %}">
-          {% csrf_token %}
-          <div class="h1">
-            <h3>Submit a response for {{ project.project_name }}</h3>
+      <div class="col-lg-5">
+        {% if is_owner %}
+          <div class="glass-panel p-4">
+            <h2 class="h5">This is your project</h2>
+            <p class="text-muted">Review proposals, chat with applicants and track milestones from your dashboard.</p>
+            <a class="btn btn-primary" href="{% url 'connect:project_manage' project.pk %}"><i class="fa-solid fa-list-check"></i> Manage project</a>
           </div>
-          <div class="form-group">
-            <label for="name">Your Name:</label>
-            <input type="text" class="form-control" id="name" name="name" required />
+        {% elif project.stage != 'open' %}
+          <div class="glass-panel p-4">
+            <h2 class="h5">Not taking proposals</h2>
+            <p class="text-muted mb-0">This project is {{ project.get_stage_display|lower }}. <a href="{% url 'localproj:all_projects' %}?stage=open">See open projects</a>.</p>
           </div>
-          <div class="form-group">
-            <label for="phone_number">Phone Number:</label>
-            <input type="text" class="form-control" id="phone_number" name="phone_number" required />
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" class="form-control" id="email" name="email" required />
-          </div>
-          <div class="form-group">
-            <label for="response">Response:</label>
-            <textarea class="form-control" id="response" name="response" rows="4" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+        {% else %}
+          <!-- Proposal form -->
+          <form method="POST" action="{% url 'localproj:add_comment' project.id %}" class="glass-panel p-4 p-md-5 sticky-aside">
+            {% csrf_token %}
+            <h2 class="h4 mb-1">Send a proposal</h2>
+            <p class="text-muted small mb-4">You'll get a private link to follow it and chat with {{ project.posted_by.name }}.</p>
+            <div class="row g-md-3">
+              <div class="col-md-6 form-group">
+                <label for="name">Your Name</label>
+                <input type="text" class="form-control" id="name" name="name" autocomplete="name" maxlength="50" value="{{ form.name.value|default:'' }}" required />
+                {% for error in form.name.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+              </div>
+              <div class="col-md-6 form-group">
+                <label for="phone_number">Phone / WhatsApp</label>
+                <input type="tel" class="form-control" id="phone_number" name="phone_number" autocomplete="tel" maxlength="15" value="{{ form.phone_number.value|default:'' }}" required />
+                {% for error in form.phone_number.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" name="email" autocomplete="email" maxlength="100" value="{{ form.email.value|default:'' }}" required />
+              {% for error in form.email.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="row g-md-3">
+              <div class="col-md-6 form-group">
+                <label for="proposed_price">Your price</label>
+                <input type="text" class="form-control" id="proposed_price" name="proposed_price" maxlength="60" placeholder="e.g. ₹12,000" value="{{ form.proposed_price.value|default:'' }}" />
+              </div>
+              <div class="col-md-6 form-group">
+                <label for="timeline">Timeline</label>
+                <input type="text" class="form-control" id="timeline" name="timeline" maxlength="60" placeholder="e.g. 2 weeks" value="{{ form.timeline.value|default:'' }}" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="response">How would you do it?</label>
+              <textarea class="form-control" id="response" name="response" rows="4" required placeholder="Your approach, relevant experience, links to past work">{{ form.response.value|default:'' }}</textarea>
+              {% for error in form.response.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Send proposal</button>
+          </form>
+        {% endif %}
       </div>
     </div>
   </div>

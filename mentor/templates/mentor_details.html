@@ -1,100 +1,122 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-  Mentor Details | The Old School
+  {{ mentor.name }}{% if mentor.headline %} · {{ mentor.headline }}{% endif %} | The Old School
 {% endblock %}
+{% block meta_description %}{{ mentor.name }}{% if mentor.headline %}, {{ mentor.headline }}{% endif %}, in {{ mentor.get_locality_display }}. {{ mentor.about|default:''|truncatewords:20 }}{% endblock %}
 {% block navigation %}
   {% include 'nav.html' %}
-  <hr />
 {% endblock %}
 {% block homebanner %}
   <div class="container mt-5">
-    <h1 class="mb-4">{{ mentor.name }}</h1>
-    <div class="row">
-      <div class="col-md-6">
-        <img src="{{ mentor.image.url }}" class="img-fluid mentor-img-personal" alt="{{ mentor.name }}" />
-      </div>
-      <div class="col-md-6">
-        {% if messages %}
-          <div class="container mt-3">
-              {% for message in messages %}
-                <li class="alert alert-{{ message.tags }}" role="alert" style="list-style: none;">{{ message }}</li>
-              {% endfor %}
-          </div>
-        {% endif %}
-        <table class="table table-bordered">
-          <tbody>
-            {% comment %} <tr>
-              <th>Contact</th>
-              <td>{{ mentor.contact }}</td>
-            </tr>
-            <tr>
-              <th>Email</th>
-              <td>{{ mentor.email }}</td>
-            </tr> {% endcomment %}
-            <tr>
-              <th>Qualification</th>
-              <td>{{ mentor.qualification }}</td>
-            </tr>
-            <tr>
-              <th>Experience</th>
-              <td>{{ mentor.experience }} years</td>
-            </tr>
-            <tr>
-              <th>Location</th>
-              <td>{{ mentor.locality }}</td>
-            </tr>
-            <tr>
-              <th>About</th>
-              <td>{{ mentor.about }}</td>
-            </tr>
-            <tr>
-              <th>Availability</th>
-              <td>From {{ mentor.start_weekday }} to {{ mentor.end_weekday }} ({{ mentor.time_from }} - {{ mentor.time_to }})</td>
-            </tr>
-            <tr>
-              <th>Instagram</th>
-              <td>
-                <a href="{{ mentor.instagram|default:'#' }}" target="_blank">{{ mentor.instagram|default:'#' }}</a>
-              </td>
-            </tr>
-            <tr>
-              <th>LinkedIn</th>
-              <td>
-                <a href="{{ mentor.linkedin|default:'#' }}" target="_blank">{{ mentor.linkedin|default:'#' }}</a>
-              </td>
-            </tr>
-            <tr>
-              <th>Facebook</th>
-              <td>
-                <a href="{{ mentor.facebook|default:'#' }}" target="_blank">{{ mentor.facebook|default:'#' }}</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <h2>Contact your mentor</h2>
-        <!-- Form to update responses -->
-        <form method="post" class="mt-4">
-          {% csrf_token %}
-          <input type="hidden" name="mentor_name" value="{{ mentor.name }}" />
-          <input type="hidden" name="mentor_contact" value="{{ mentor.contact }}" />
+    <a href="{% url 'mentor:all_mentor' %}" class="btn btn-secondary mb-4"><i class="fa-solid fa-arrow-left"></i> All mentors</a>
+    <div class="row g-4 g-lg-5">
+      <!-- Profile summary -->
+      <div class="col-lg-4">
+        <div class="sticky-aside">
+          <div class="glass-panel p-4 text-center profile-card" data-reveal>
+            <div class="mentor-avatar mentor-avatar-lg">
+              <img src="{{ mentor.image.url }}" class="mentor-img-personal" alt="{{ mentor.name }}" />
+              {% if mentor.verified %}
+                <span class="verified-badge" title="Verified by Oldscool"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span>
+              {% endif %}
+            </div>
+            <h1 class="h3 page-title mt-3 mb-1">{{ mentor.name }}</h1>
+            {% if mentor.headline %}<p class="mentor-headline mb-2">{{ mentor.headline }}</p>{% endif %}
+            {% if mentor.verified %}
+              <p class="verified-line"><i class="fa-solid fa-shield-halved"></i> Verified in person by Oldscool</p>
+            {% endif %}
 
-          <div class="form-group">
-            <label for="mentee_name">Mentee Name</label>
-            <input type="text" id="mentee_name" name="mentee_name" class="form-control" required />
+            <div class="stat-row">
+              <div>
+                <strong>{% if stats.rating %}<i class="fa-solid fa-star text-warning"></i> {{ stats.rating }}{% else %}New{% endif %}</strong>
+                <span>{% if stats.review_count %}{{ stats.review_count }} review{{ stats.review_count|pluralize }}{% else %}No reviews yet{% endif %}</span>
+              </div>
+              <div>
+                <strong>{{ stats.completed }}</strong>
+                <span>session{{ stats.completed|pluralize }} done</span>
+              </div>
+              <div>
+                <strong>{% if stats.response_hours is not None %}{% if stats.response_hours < 1 %}&lt; 1h{% elif stats.response_hours < 24 %}~{{ stats.response_hours|floatformat:0 }}h{% else %}~{% widthratio stats.response_hours 24 1 %}d{% endif %}{% else %}–{% endif %}</strong>
+                <span>usual reply</span>
+              </div>
+            </div>
+
+            <ul class="profile-facts">
+              <li><i class="fa-solid fa-location-dot"></i> {{ mentor.get_locality_display }}</li>
+              {% if mentor.experience %}<li><i class="fa-solid fa-briefcase"></i> {{ mentor.experience }} years experience</li>{% endif %}
+              {% if mentor.language_list %}<li><i class="fa-solid fa-language"></i> {{ mentor.language_list|join:", " }}</li>{% endif %}
+              {% if mentor.has_schedule %}
+                <li><i class="fa-regular fa-clock"></i> {{ mentor.get_start_weekday_display }}–{{ mentor.get_end_weekday_display }}, {{ mentor.time_from|time:"g:i A" }}–{{ mentor.time_to|time:"g:i A" }}</li>
+              {% endif %}
+            </ul>
+
+            {% with specs=mentor.specializations.all %}
+              {% if specs %}
+                <div class="skill-chips justify-content-center">
+                  {% for spec in specs %}
+                    <a class="chip" href="{% url 'mentor:skill' spec.id spec.specialist|slugify|default:'skill' %}">{{ spec.specialist }}</a>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
+            <div class="social-row">
+              {% if mentor.linkedin %}<a href="{{ mentor.linkedin }}" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>{% endif %}
+              {% if mentor.instagram %}<a href="{{ mentor.instagram }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>{% endif %}
+              {% if mentor.Facebook %}<a href="{{ mentor.Facebook }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>{% endif %}
+            </div>
+
+            <a href="#book" class="btn btn-primary w-100 mt-3">
+              {% if mentor.free_intro %}Book a free intro{% else %}Book a session{% endif %} <i class="fa-solid fa-arrow-right"></i>
+            </a>
           </div>
-          <div class="form-group">
-            <label for="contact_number">Contact Number</label>
-            <input type="text" id="contact_number" name="contact_number" class="form-control" required />
-          </div>
-          <div class="form-group">
-            <label for="mentee_requirement">Mentee Requirement</label>
-            <textarea id="mentee_requirement" name="mentee_requirement" class="form-control" rows="3" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Submit Response</button>
-        </form>
+        </div>
+      </div>
+
+      <!-- Details, booking, reviews -->
+      <div class="col-lg-8">
+        <section class="glass-panel p-4 p-md-5 mb-4">
+          <h2 class="h4 mb-3">About</h2>
+          <p class="mb-0 text-preline">{{ mentor.about|default:"This mentor hasn't written an introduction yet." }}</p>
+          {% if mentor.qualification %}
+            <hr class="my-4" />
+            <p class="mb-0"><strong>Qualification:</strong> {{ mentor.qualification }}</p>
+          {% endif %}
+        </section>
+
+        {% include 'partials/booking_form.html' with form=booking_form %}
+
+        {% if invite_form %}
+          <form method="post" action="{% url 'connect:invite' mentor.pk %}" class="glass-panel p-4 mb-4">
+            {% csrf_token %}
+            <h2 class="h5 mb-3"><i class="fa-solid fa-envelope-open-text"></i> Invite {{ mentor.name }} to one of your projects</h2>
+            <div class="row g-2">
+              <div class="col-md-5">{{ invite_form.project }}</div>
+              <div class="col-md-5">{{ invite_form.note }}</div>
+              <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Invite</button></div>
+            </div>
+          </form>
+        {% endif %}
+
+        <section class="glass-panel p-4 p-md-5" id="reviews">
+          <h2 class="h4 mb-3">Reviews {% if stats.review_count %}<span class="text-muted fs-6">({{ stats.review_count }})</span>{% endif %}</h2>
+          {% for review in reviews %}
+            <article class="review">
+              <div class="review-head">
+                <strong>{{ review.reviewer_name }}</strong>
+                <span class="review-stars" aria-label="{{ review.rating }} out of 5">
+                  {% for i in "12345" %}<i class="fa-{% if forloop.counter <= review.rating %}solid{% else %}regular{% endif %} fa-star"></i>{% endfor %}
+                </span>
+                <time datetime="{{ review.created_at|date:'c' }}">{{ review.created_at|date:"M Y" }}</time>
+              </div>
+              {% if review.comment %}<p class="mb-0">{{ review.comment }}</p>{% endif %}
+            </article>
+          {% empty %}
+            <p class="text-muted mb-0">No reviews yet. People who book a session can leave one afterwards.</p>
+          {% endfor %}
+        </section>
       </div>
     </div>
-    <a href="{% url 'mentor:all_mentor' %}" class="btn btn-secondary mt-3">Back to Mentors</a>
   </div>
 {% endblock %}
